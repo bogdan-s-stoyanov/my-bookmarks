@@ -16,6 +16,9 @@ namespace MyBookmarks.Data
         {
             base.OnModelCreating(builder);
             builder.ApplyConfiguration(new BookmarkCollectionConfiguration());
+            builder.ApplyConfiguration(new CategoryConfiguration());
+            builder.ApplyConfiguration(new BookmarkConfiguration());
+            builder.ApplyConfiguration(new CollectionConfiguration());
         }
     }
 }
