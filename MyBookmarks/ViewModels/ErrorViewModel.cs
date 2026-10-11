@@ -1,4 +1,4 @@
-namespace MyBookmarks.Models
+namespace MyBookmarks.ViewModels
 {
     public class ErrorViewModel
     {
