@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="MyBookmarks.Data/MyBookmarks.Data.csproj" Id="bdf5a341-da59-47cf-b720-459ec7f343a9" />
+  <Project Path="MyBookmarks/MyBookmarks.csproj" />
+</Solution>
