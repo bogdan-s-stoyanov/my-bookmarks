@@ -14,6 +14,9 @@ namespace MyBookmarks.Data.Configurations
             builder.HasOne(b => b.User)
                 .WithMany()
                 .OnDelete(DeleteBehavior.Restrict);
+
+            builder.HasIndex(b => new { b.UserId, b.Title })
+                .IsUnique();
         }
     }
 }
