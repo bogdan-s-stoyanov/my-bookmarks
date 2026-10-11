@@ -1,5 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
-using MyBookmarks.Models;
+using MyBookmarks.ViewModels;
 using System.Diagnostics;
 
 namespace MyBookmarks.Controllers
