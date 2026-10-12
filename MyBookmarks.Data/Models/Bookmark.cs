@@ -24,10 +24,10 @@ namespace MyBookmarks.Data.Models
 
         public bool IsFavorite { get; set; }
 
-        public int CategoryId { get; set; }
+        public int? CategoryId { get; set; }
 
         [ForeignKey(nameof(CategoryId))]
-        public Category Category { get; set; } = null!;
+        public Category? Category { get; set; } = null!;
 
         public string UserId { get; set; } = null!;
 
