@@ -13,7 +13,7 @@ namespace MyBookmarks.Data.Configurations
         {
             builder.HasMany(c => c.Bookmarks)
                 .WithOne(b => b.Category)
-                .OnDelete(DeleteBehavior.Restrict);
+                .OnDelete(DeleteBehavior.SetNull);
 
             builder.HasOne(c => c.User)
                 .WithMany()

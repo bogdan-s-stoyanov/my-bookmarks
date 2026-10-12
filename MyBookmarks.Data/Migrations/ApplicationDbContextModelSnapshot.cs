@@ -232,7 +232,7 @@ namespace MyBookmarks.Data.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("CategoryId")
+                    b.Property<int?>("CategoryId")
                         .HasColumnType("int");
 
                     b.Property<DateTime>("DateAdded")
@@ -394,8 +394,7 @@ namespace MyBookmarks.Data.Migrations
                     b.HasOne("MyBookmarks.Data.Models.Category", "Category")
                         .WithMany("Bookmarks")
                         .HasForeignKey("CategoryId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.SetNull);
 
                     b.HasOne("Microsoft.AspNetCore.Identity.IdentityUser", "User")
                         .WithMany()
