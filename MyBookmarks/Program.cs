@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using MyBookmarks.Common;
 using MyBookmarks.Data;
 
 namespace MyBookmarks
@@ -16,8 +17,18 @@ namespace MyBookmarks
                 options.UseSqlServer(connectionString));
             builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
-            builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = false)
-                .AddEntityFrameworkStores<MyBookmarksDbContext>();
+            builder.Services.AddDefaultIdentity<IdentityUser>(options =>
+            {
+                options.SignIn.RequireConfirmedAccount = false;
+                options.User.RequireUniqueEmail = true;
+
+                options.Password.RequiredLength = AccountValidationConstants.PasswordMinLength;
+                options.Password.RequireLowercase = true;
+                options.Password.RequireUppercase = true;
+                options.Password.RequireDigit = true;
+                options.Password.RequireNonAlphanumeric = false;
+            })
+            .AddEntityFrameworkStores<MyBookmarksDbContext>();
             builder.Services.AddControllersWithViews();
 
             WebApplication app = builder.Build();
