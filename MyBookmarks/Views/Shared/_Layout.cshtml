@@ -33,6 +33,15 @@
                         <a class="nav-link" asp-area="" asp-controller="Home" asp-action="Index"> Home </a>
                     </div>
                 </div>
+                @if (User.Identity?.IsAuthenticated == true)
+                {
+                    <div class="sb-sidenav-footer">
+                        <div class="small">Logged in as:</div>
+                        <div class="text-break">
+                            @User.Identity.Name
+                        </div>
+                    </div>
+                }
             </nav>
         </div>
 
