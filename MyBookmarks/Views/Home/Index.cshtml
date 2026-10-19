@@ -1,8 +1,64 @@
-﻿@{
-    ViewData["Title"] = "Home Page";
+@{
+    ViewData["Title"] = "Home";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<div class="container home-page">
+    <section class="text-center mb-5">
+        <h1 class="display-4 fw-bold mb-3">MyBookmarks</h1>
+
+        <p class="lead text-muted home-description mb-4">
+            Your useful links, organized in one place.
+        </p>
+
+        @if (User.Identity?.IsAuthenticated != true)
+        {
+            <div class="d-flex flex-wrap justify-content-center gap-3">
+                <a class="btn btn-primary btn-lg"
+                   asp-area="Identity"
+                   asp-page="/Account/Register">
+                    Create account
+                </a>
+
+                <a class="btn btn-outline-primary btn-lg"
+                   asp-area="Identity"
+                   asp-page="/Account/Login">
+                    Log in
+                </a>
+            </div>
+        }
+    </section>
+
+    <section aria-label="Main features">
+        <div class="row g-5 text-center">
+            <div class="col-12 col-md-4">
+                <div class="home-feature h-100 p-4">
+                    <h2 class="h5 mb-3">Save links</h2>
+                    <p class="text-muted mb-0">
+                        Keep useful websites, articles and resources
+                        in one place.
+                    </p>
+                </div>
+            </div>
+
+            <div class="col-12 col-md-4">
+                <div class="home-feature h-100 p-4">
+                    <h2 class="h5 mb-3">Organize your library</h2>
+                    <p class="text-muted mb-0">
+                        Group your bookmarks into categories
+                        and collections.
+                    </p>
+                </div>
+            </div>
+
+            <div class="col-12 col-md-4">
+                <div class="home-feature h-100 p-4">
+                    <h2 class="h5 mb-3">Find links quickly</h2>
+                    <p class="text-muted mb-0">
+                        Search your library and keep
+                        your favorites close.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
 </div>
