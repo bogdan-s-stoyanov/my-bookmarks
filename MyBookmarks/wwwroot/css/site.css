@@ -16,3 +16,25 @@ html {
   position: relative;
   min-height: 100%;
 }
+
+.home-description {
+    max-width: 640px;
+    margin-inline: auto;
+}
+
+.home-feature {
+    background-color: #f8f9fa;
+    border: 1px solid #e9ecef;
+    border-top: 3px solid #0d6efd;
+    border-radius: 12px;
+}
+
+.home-page {
+    padding-top: clamp(3rem, 10vh, 6rem);
+    padding-bottom: 3rem;
+}
+
+.guest-layout #layoutSidenav #layoutSidenav_content {
+    margin-left: 0;
+    padding-left: 0;
+}
