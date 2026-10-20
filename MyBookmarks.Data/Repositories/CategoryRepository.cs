@@ -27,5 +27,17 @@ namespace MyBookmarks.Data.Repositories
                 .Take(take)
                 .ToListAsync();
         }
+
+        public async Task<bool> ExistsByNameAsync(string userId, string name)
+        {
+            return await dbContext.Categories
+                .AnyAsync(c => c.UserId == userId && c.Name == name);
+        }
+
+        public async Task AddCategoryAsync(Category category)
+        {
+            dbContext.Categories.Add(category);
+            await dbContext.SaveChangesAsync();
+        }
     }
 }

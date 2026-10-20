@@ -8,5 +8,9 @@ namespace MyBookmarks.Data.Repositories.Contracts
     public interface ICategoryRepository
     {
         Task<List<Category>> GetCategoryByUserIdAsync(string userId, int take, int skip);
+
+        Task<bool> ExistsByNameAsync(string userId, string name);
+
+        Task AddCategoryAsync(Category category);
     }
 }

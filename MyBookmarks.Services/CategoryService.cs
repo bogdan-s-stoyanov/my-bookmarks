@@ -35,5 +35,25 @@ namespace MyBookmarks.Services
                 })
                 .ToList();
         }
+
+        public async Task<bool> TryCreateAsync(string userId, CategoryCreateDto dto)
+        {
+            string name = dto.Name.Trim();
+
+            if (await categoryRepository.ExistsByNameAsync(userId, name))
+            {
+                return false; 
+            }
+
+            Category category = new Category()
+            {
+                UserId = userId,
+                Name = name
+            };
+
+            await categoryRepository.AddCategoryAsync(category);
+
+            return true;
+        }
     }
 }
