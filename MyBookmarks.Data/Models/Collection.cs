@@ -1,5 +1,5 @@
 ﻿using Microsoft.AspNetCore.Identity;
-using MyBookmarks.Data.Common.EntityValidation;
+using MyBookmarks.Common.EntityValidation;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 

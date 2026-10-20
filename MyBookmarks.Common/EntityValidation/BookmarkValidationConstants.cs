@@ -1,4 +1,4 @@
-﻿namespace MyBookmarks.Data.Common.EntityValidation
+﻿namespace MyBookmarks.Common.EntityValidation
 {
     public static class BookmarkValidationConstants
     {

@@ -1,4 +1,6 @@
 <Solution>
+  <Project Path="MyBookmarks.Common/MyBookmarks.Common.csproj" Id="c9797b0c-1e39-434a-9b28-28289a3a56b0" />
   <Project Path="MyBookmarks.Data/MyBookmarks.Data.csproj" Id="bdf5a341-da59-47cf-b720-459ec7f343a9" />
+  <Project Path="MyBookmarks.Services/MyBookmarks.Services.csproj" Id="cce8728f-48a5-4ee3-90bc-a0448ba2ab62" />
   <Project Path="MyBookmarks/MyBookmarks.csproj" />
 </Solution>

@@ -2,6 +2,11 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using MyBookmarks.Common;
 using MyBookmarks.Data;
+using MyBookmarks.Data.Models;
+using MyBookmarks.Data.Repositories;
+using MyBookmarks.Data.Repositories.Contracts;
+using MyBookmarks.Services;
+using MyBookmarks.Services.Contracts;
 
 namespace MyBookmarks
 {
@@ -30,6 +35,9 @@ namespace MyBookmarks
             })
             .AddEntityFrameworkStores<MyBookmarksDbContext>();
             builder.Services.AddControllersWithViews();
+
+            builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
+            builder.Services.AddScoped<ICategoryService, CategoryService>();
 
             WebApplication app = builder.Build();
 
