@@ -1,9 +1,9 @@
-﻿using MyBookmarks.ViewModels.Category;
+﻿using MyBookmarks.Services.DTOs;
 
 namespace MyBookmarks.Services.Contracts
 {
     public interface ICategoryService
     {
-        Task<List<CategoryListItemViewModel>> GetUserCategoriesAsync(string userId, int pageNumber);
+        Task<List<CategoryListItemDto>> GetUserCategoriesAsync(string userId, int pageNumber);
     }
 }

@@ -2,7 +2,7 @@
 using MyBookmarks.Data.Models;
 using MyBookmarks.Data.Repositories.Contracts;
 using MyBookmarks.Services.Contracts;
-using MyBookmarks.ViewModels.Category;
+using MyBookmarks.Services.DTOs;
 
 namespace MyBookmarks.Services
 {
@@ -15,7 +15,7 @@ namespace MyBookmarks.Services
             this.categoryRepository = categoryRepository;
         }
 
-        public async Task<List<CategoryListItemViewModel>> GetUserCategoriesAsync(string userId, int pageNumber)
+        public async Task<List<CategoryListItemDto>> GetUserCategoriesAsync(string userId, int pageNumber)
         {
             if (pageNumber < 1)
             {
@@ -28,7 +28,7 @@ namespace MyBookmarks.Services
             List<Category> categories = await categoryRepository.GetCategoryByUserIdAsync(userId, pageSize, skipped);
 
             return categories
-                .Select(c => new CategoryListItemViewModel
+                .Select(c => new CategoryListItemDto
                 {
                     Id = c.Id,
                     Name = c.Name
