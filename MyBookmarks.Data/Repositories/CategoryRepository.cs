@@ -16,7 +16,7 @@ namespace MyBookmarks.Data.Repositories
             this.dbContext = dbContext;
         }
 
-        public async Task<List<Category>> GetCategoryByUserIdAsync(string userId, int take, int skip)
+        public async Task<List<Category>> GetCategoriesByUserIdAsync(string userId, int take, int skip)
         {
             return await dbContext.Categories
                 .AsNoTracking()
@@ -34,10 +34,34 @@ namespace MyBookmarks.Data.Repositories
                 .AnyAsync(c => c.UserId == userId && c.Name == name);
         }
 
-        public async Task AddCategoryAsync(Category category)
+        public async Task AddAsync(Category category)
         {
             dbContext.Categories.Add(category);
             await dbContext.SaveChangesAsync();
+        }
+
+        public async Task<Category?> GetById(string userId, int id)
+        {
+            return await dbContext.Categories
+                .FirstOrDefaultAsync(c => c.UserId == userId && id == c.Id);
+        }
+
+        public async Task<bool> ExistsByNameExceptId(string userId, string name, int excludeId)
+        {
+            return await dbContext.Categories
+                .AnyAsync(c => c.UserId == userId && c.Name == name && c.Id != excludeId);
+        }
+
+        public async Task UpdateAsync(Category category)
+        {
+            dbContext.Categories.Update(category);
+            await dbContext.SaveChangesAsync();
+        }
+
+        public async Task DeleteAsync(Category category)
+        {
+            dbContext.Categories.Remove(category);
+            await dbContext.SaveChangesAsync();    
         }
     }
 }

@@ -3,6 +3,7 @@ using MyBookmarks.Data.Models;
 using MyBookmarks.Data.Repositories.Contracts;
 using MyBookmarks.Services.Contracts;
 using MyBookmarks.Services.DTOs;
+using MyBookmarks.Services.Results;
 
 namespace MyBookmarks.Services
 {
@@ -25,7 +26,7 @@ namespace MyBookmarks.Services
             int pageSize = PageConstants.CategoriesPageSize;
             int skipped = (pageNumber - 1) * pageSize;
 
-            List<Category> categories = await categoryRepository.GetCategoryByUserIdAsync(userId, pageSize, skipped);
+            List<Category> categories = await categoryRepository.GetCategoriesByUserIdAsync(userId, pageSize, skipped);
 
             return categories
                 .Select(c => new CategoryListItemDto
@@ -42,7 +43,7 @@ namespace MyBookmarks.Services
 
             if (await categoryRepository.ExistsByNameAsync(userId, name))
             {
-                return false; 
+                return false;
             }
 
             Category category = new Category()
@@ -51,9 +52,80 @@ namespace MyBookmarks.Services
                 Name = name
             };
 
-            await categoryRepository.AddCategoryAsync(category);
+            await categoryRepository.AddAsync(category);
 
             return true;
+        }
+
+        public async Task<CategoryEditDto?> GetForEditAsync(string userId, int id)
+        {
+            Category? category = await categoryRepository.GetById(userId, id);
+
+            if (category == null)
+            {
+                return null;
+            }
+
+            return new CategoryEditDto()
+            {
+                Id = category.Id,
+                Name = category.Name
+            };
+        }
+
+        public async Task<CategoryEditResult> CategoryEditAsync(string userId, CategoryEditDto editDto)
+        {
+            Category? category = await categoryRepository.GetById(userId, editDto.Id);
+
+            if (category == null)
+            {
+                return CategoryEditResult.NotFound;
+            }
+
+            string name = editDto.Name.Trim();
+
+            bool nameAlreadyExists = await categoryRepository.ExistsByNameExceptId(userId, name, editDto.Id);
+
+            if (nameAlreadyExists)
+            {
+                return CategoryEditResult.DuplicateName;
+            }
+
+            category.Name = name;
+
+            await categoryRepository.UpdateAsync(category);
+
+            return CategoryEditResult.Success;
+        }
+
+        public async Task<bool> TryDeleteAsync(string userId, int id)
+        {
+            Category? category = await categoryRepository.GetById(userId, id);
+
+            if (category == null)
+            {
+                return false;
+            }
+
+            await categoryRepository.DeleteAsync(category);
+
+            return true;
+        }
+
+        public async Task<CategoryDeleteDto?> GetForDeleteAsync(string userId, int id)
+        {
+            Category? category = await categoryRepository.GetById(userId, id);
+
+            if (category == null)
+            {
+                return null;
+            }
+
+            return new CategoryDeleteDto
+            {
+                Id = category.Id,
+                Name = category.Name
+            };
         }
     }
 }

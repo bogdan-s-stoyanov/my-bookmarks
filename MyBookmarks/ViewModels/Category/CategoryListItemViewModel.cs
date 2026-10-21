@@ -1,4 +1,7 @@
-﻿namespace MyBookmarks.ViewModels.Category
+﻿using MyBookmarks.Common.EntityValidation;
+using System.ComponentModel.DataAnnotations;
+
+namespace MyBookmarks.ViewModels.Category
 {
     public class CategoryListItemViewModel
     {

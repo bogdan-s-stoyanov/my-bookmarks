@@ -6,7 +6,7 @@ namespace MyBookmarks.ViewModels.Category
     public class CategoryCreateViewModel
     {
         [Required]
-        [StringLength(CategoryValidationConstants.NameMaxLength)]
+        [MaxLength(CategoryValidationConstants.NameMaxLength)]
         public string Name { get; set; } = null!;
     }
 }
