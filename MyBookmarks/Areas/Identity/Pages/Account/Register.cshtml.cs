@@ -22,6 +22,7 @@ using MyBookmarks.Common;
 
 namespace MyBookmarks.Areas.Identity.Pages.Account
 {
+    [AllowAnonymous]
     public class RegisterModel : PageModel
     {
         private readonly SignInManager<IdentityUser> _signInManager;

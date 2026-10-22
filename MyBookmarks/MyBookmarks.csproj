@@ -25,7 +25,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\MyBookmarks.Common\MyBookmarks.Common.csproj" />
     <ProjectReference Include="..\MyBookmarks.Data\MyBookmarks.Data.csproj" />
+    <ProjectReference Include="..\MyBookmarks.Services\MyBookmarks.Services.csproj" />
   </ItemGroup>
 
 </Project>

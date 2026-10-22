@@ -1,7 +1,15 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MyBookmarks.Common;
 using MyBookmarks.Data;
+using MyBookmarks.Data.Repositories;
+using MyBookmarks.Data.Repositories.Contracts;
+using MyBookmarks.Services;
+using MyBookmarks.Services.Contracts;
+
+
 
 namespace MyBookmarks
 {
@@ -29,7 +37,20 @@ namespace MyBookmarks
                 options.Password.RequireNonAlphanumeric = false;
             })
             .AddEntityFrameworkStores<MyBookmarksDbContext>();
-            builder.Services.AddControllersWithViews();
+            builder.Services.AddAuthorization(options =>
+            {
+                options.FallbackPolicy = new AuthorizationPolicyBuilder()
+                    .RequireAuthenticatedUser()
+                    .Build();
+            });
+
+            builder.Services.AddControllersWithViews(options =>
+            {
+                options.Filters.Add(new AutoValidateAntiforgeryTokenAttribute());
+            });
+
+            builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
+            builder.Services.AddScoped<ICategoryService, CategoryService>();
 
             WebApplication app = builder.Build();
 
@@ -41,7 +62,6 @@ namespace MyBookmarks
             else
             {
                 app.UseExceptionHandler("/Home/Error");
-                // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                 app.UseHsts();
             }
 
@@ -51,7 +71,8 @@ namespace MyBookmarks
             app.UseAuthentication();
             app.UseAuthorization();
 
-            app.MapStaticAssets();
+            app.MapStaticAssets()
+                .AllowAnonymous();
             app.MapControllerRoute(
                 name: "default",
                 pattern: "{controller=Home}/{action=Index}/{id?}")
