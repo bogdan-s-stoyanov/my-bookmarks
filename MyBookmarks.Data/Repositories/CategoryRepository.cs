@@ -63,5 +63,11 @@ namespace MyBookmarks.Data.Repositories
             dbContext.Categories.Remove(category);
             await dbContext.SaveChangesAsync();    
         }
+
+        public async Task<int> CountCategoriesForUserAsync(string userId)
+        {
+            return await dbContext.Categories
+                .CountAsync(c => c.UserId == userId);
+        }
     }
 }

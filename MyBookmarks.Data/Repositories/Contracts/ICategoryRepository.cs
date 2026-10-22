@@ -20,5 +20,7 @@ namespace MyBookmarks.Data.Repositories.Contracts
         Task UpdateAsync(Category category);
 
         Task DeleteAsync(Category category);
+
+        Task<int> CountCategoriesForUserAsync(string userId);
     }
 }

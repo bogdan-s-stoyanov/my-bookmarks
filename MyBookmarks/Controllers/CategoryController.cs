@@ -35,14 +35,23 @@ namespace MyBookmarks.Controllers
                 return Challenge();
             }
 
-            List<CategoryListItemDto> categories = await categoryService
-                .GetUserCategoriesAsync(userId, pageNumber);
+            CategoryPageDto page = await categoryService.
+                GetUserCategoriesAsync(userId, pageNumber);
 
-            List<CategoryListItemViewModel> model = categories.Select(c => new CategoryListItemViewModel()
+            CategoryIndexViewModel model = new()
             {
-                Id = c.Id,
-                Name = c.Name
-            }).ToList();
+                Categories = page.Categories
+                     .Select(c => new CategoryListItemViewModel
+                     {
+                         Id = c.Id,
+                         Name = c.Name
+                     })
+                     .ToList(),
+
+                TotalCount = page.TotalCount,
+                PageNumber = page.PageNumber,
+                PageSize = page.PageSize
+            };
 
             return View(model);
         }
@@ -107,13 +116,13 @@ namespace MyBookmarks.Controllers
                 return NotFound();
             }
 
-            CategoryEditViewModel categoryEditViewModel = new()
+            CategoryEditViewModel model = new()
             {
                 Id = category.Id,
                 Name = category.Name
             };
 
-            return View(categoryEditViewModel);
+            return View(model);
         }
 
         [HttpPost]

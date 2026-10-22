@@ -5,7 +5,7 @@ namespace MyBookmarks.Services.Contracts
 {
     public interface ICategoryService
     {
-        Task<List<CategoryListItemDto>> GetUserCategoriesAsync(string userId, int pageNumber);
+        Task<CategoryPageDto> GetUserCategoriesAsync(string userId, int pageNumber);
 
         Task<bool> TryCreateAsync(string userId, CategoryCreateDto dto);
 

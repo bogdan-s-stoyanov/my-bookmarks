@@ -1,4 +1,5 @@
-﻿using MyBookmarks.Common;
+﻿using Microsoft.EntityFrameworkCore.Metadata.Internal;
+using MyBookmarks.Common;
 using MyBookmarks.Data.Models;
 using MyBookmarks.Data.Repositories.Contracts;
 using MyBookmarks.Services.Contracts;
@@ -16,7 +17,7 @@ namespace MyBookmarks.Services
             this.categoryRepository = categoryRepository;
         }
 
-        public async Task<List<CategoryListItemDto>> GetUserCategoriesAsync(string userId, int pageNumber)
+        public async Task<CategoryPageDto> GetUserCategoriesAsync(string userId, int pageNumber)
         {
             if (pageNumber < 1)
             {
@@ -24,17 +25,34 @@ namespace MyBookmarks.Services
             }
 
             int pageSize = PageConstants.CategoriesPageSize;
+
+            int totalCount = await categoryRepository
+                                .CountCategoriesForUserAsync(userId);
+
+            int totalPages = Math.Max(
+                1, (int)Math.Ceiling((double)totalCount / pageSize));
+
+            pageNumber = Math.Clamp(pageNumber, 1, totalPages);
+
             int skipped = (pageNumber - 1) * pageSize;
 
-            List<Category> categories = await categoryRepository.GetCategoriesByUserIdAsync(userId, pageSize, skipped);
+            List<Category> categories = await categoryRepository
+                .GetCategoriesByUserIdAsync(userId, pageSize, skipped);
 
-            return categories
-                .Select(c => new CategoryListItemDto
-                {
-                    Id = c.Id,
-                    Name = c.Name
-                })
-                .ToList();
+            return new CategoryPageDto
+            {
+                Categories = categories
+                    .Select(c => new CategoryListItemDto
+                    {
+                        Id = c.Id,
+                        Name = c.Name
+                    })
+                    .ToList(),
+
+                TotalCount = totalCount,
+                PageNumber = pageNumber,
+                PageSize = pageSize
+            };
         }
 
         public async Task<bool> TryCreateAsync(string userId, CategoryCreateDto dto)
@@ -66,7 +84,7 @@ namespace MyBookmarks.Services
                 return null;
             }
 
-            return new CategoryEditDto()
+            return new CategoryEditDto
             {
                 Id = category.Id,
                 Name = category.Name

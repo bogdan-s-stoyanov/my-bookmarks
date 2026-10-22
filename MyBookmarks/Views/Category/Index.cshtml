@@ -1,4 +1,4 @@
-﻿@model List<CategoryListItemViewModel>
+﻿@model CategoryIndexViewModel
 
 @{
     ViewData["Title"] = "My categories";
@@ -10,7 +10,7 @@
     Add category
 </a>
 
-@if (Model.Count == 0)
+@if (Model.Categories.Count == 0)
 {
     <div class="alert alert-info">
         No categories found.
@@ -19,7 +19,7 @@
 else
 {
     <ul class="list-group">
-        @foreach (var category in Model)
+        @foreach (var category in Model.Categories)
         {
             <li class="list-group-item d-flex justify-content-between align-items-center">
                 <span>@category.Name</span>
@@ -40,4 +40,47 @@ else
             </li>
         }
     </ul>
+}
+
+@if (Model.TotalPages > 1)
+{
+    <nav class="mt-4" aria-label="Category pages">
+        <ul class="pagination justify-content-center">
+            <li class="page-item">
+                @if (Model.PageNumber > 1)
+                {
+                    <a class="page-link"
+                       asp-action="Index"
+                       asp-route-pageNumber="@(Model.PageNumber - 1)">
+                        Previous
+                    </a>
+                }
+                else
+                {
+                    <span class="page-link text-muted">Previous</span>
+                }
+            </li>
+
+            <li class="page-item">
+                <span class="page-link text-body">
+                    Page @Model.PageNumber of @Model.TotalPages
+                </span>
+            </li>
+
+            <li class="page-item">
+                @if (Model.PageNumber < Model.TotalPages)
+                {
+                    <a class="page-link"
+                       asp-action="Index"
+                       asp-route-pageNumber="@(Model.PageNumber + 1)">
+                        Next
+                    </a>
+                }
+                else
+                {
+                    <span class="page-link text-muted">Next</span>
+                }
+            </li>
+        </ul>
+    </nav>
 }
