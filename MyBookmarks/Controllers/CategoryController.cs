@@ -1,10 +1,10 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using MyBookmarks.Common;
 using MyBookmarks.Services.Contracts;
-using MyBookmarks.Services.DTOs;
+using MyBookmarks.Services.DTOs.Category;
+using MyBookmarks.Services.DTOs.Pagination;
 using MyBookmarks.Services.Results;
 using MyBookmarks.ViewModels.Category;
-using System.Reflection.Metadata;
 using System.Security.Claims;
 
 namespace MyBookmarks.Controllers
@@ -35,12 +35,12 @@ namespace MyBookmarks.Controllers
                 return Challenge();
             }
 
-            CategoryPageDto page = await categoryService.
+            PagedResultDto<CategoryListItemDto> page = await categoryService.
                 GetUserCategoriesAsync(userId, pageNumber);
 
             CategoryIndexViewModel model = new()
             {
-                Categories = page.Categories
+                Categories = page.Items
                      .Select(c => new CategoryListItemViewModel
                      {
                          Id = c.Id,
