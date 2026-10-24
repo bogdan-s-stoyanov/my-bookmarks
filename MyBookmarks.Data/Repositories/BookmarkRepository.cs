@@ -40,5 +40,23 @@ namespace MyBookmarks.Data.Repositories
             dbContext.Bookmarks.Add(bookmark);
             await dbContext.SaveChangesAsync();
         }
+
+        public async Task<bool> ExistsByIdAsync(string userId, int id)
+        {
+            return await dbContext.Bookmarks
+                .AnyAsync(b => b.UserId == userId && b.Id == id);
+        }
+
+        public async Task<bool> ExistsByUrlAsync(string userId, string url)
+        {
+            return await dbContext.Bookmarks
+                .AnyAsync(b => b.UserId == userId && b.Url == url);
+        }
+
+        public async Task<bool> ExistsByTitleAsync(string userId, string title)
+        {
+            return await dbContext.Bookmarks
+                .AnyAsync(b => b.UserId == userId && b.Title == title );
+        }
     }
 }

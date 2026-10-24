@@ -17,5 +17,7 @@ namespace MyBookmarks.Services.Contracts
         Task<bool> TryDeleteAsync(string userId, int id);
 
         Task<CategoryDeleteDto?> GetForDeleteAsync(string userId, int id);
+
+        Task<List<CategoryListItemDto>> GetOptionsAsync(string userId);
     }
 }

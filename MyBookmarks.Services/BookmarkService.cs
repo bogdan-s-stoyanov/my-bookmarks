@@ -1,22 +1,25 @@
 ﻿using MyBookmarks.Common;
+using MyBookmarks.Common.EntityValidation;
 using MyBookmarks.Data.Models;
 using MyBookmarks.Data.Repositories.Contracts;
 using MyBookmarks.Services.Contracts;
 using MyBookmarks.Services.DTOs.Bookmark;
 using MyBookmarks.Services.DTOs.Pagination;
-using System;
-using System.Collections.Generic;
-using System.Text;
+using MyBookmarks.Services.Helpers;
+using MyBookmarks.Services.Results;
 
 namespace MyBookmarks.Services
 {
     public class BookmarkService : IBookmarkService
     {
-        private IBookmarkRepository bookmarkRepository;
+        private readonly IBookmarkRepository bookmarkRepository;
+        private readonly ICategoryRepository categoryRepository;
 
-        public BookmarkService(IBookmarkRepository bookmarkRepository)
+        public BookmarkService(IBookmarkRepository bookmarkRepository, 
+            ICategoryRepository categoryRepository)
         {
             this.bookmarkRepository = bookmarkRepository;
+            this.categoryRepository = categoryRepository;
         }
 
         public async Task<PagedResultDto<BookmarkListItemDto>> GetUserBookmarksAsync(string userId, int pageNumber)
@@ -52,6 +55,60 @@ namespace MyBookmarks.Services
                 PageNumber = pageNumber,
                 PageSize = pageSize
             };
+        }
+
+
+        public async Task<BookmarkCreateResult> CreateAsync(string userId, BookmarkCreateDto bookmarkDto)
+        {
+            if (!UrlHelper.TryNormalize(bookmarkDto.Url, out string normalizedUrl))
+            {
+                return BookmarkCreateResult.InvalidUrl;
+            }
+
+            // Normalization could make the URL longer.
+            // Example: https://example.com → https://example.com/
+            if (normalizedUrl.Length > BookmarkValidationConstants.UrlMaxLength)
+            {
+                return BookmarkCreateResult.InvalidUrl;
+            }
+
+            string title = bookmarkDto.Title.Trim();
+
+            if (await bookmarkRepository.ExistsByTitleAsync(userId, title))
+            {
+                return BookmarkCreateResult.DuplicateTitle;
+            }
+
+            if (await bookmarkRepository.ExistsByUrlAsync(userId, normalizedUrl))
+            {
+                return BookmarkCreateResult.DuplicateUrl;
+            }
+
+            if (bookmarkDto.CategoryId.HasValue)
+            {
+                Category? category = await categoryRepository
+                    .GetById(userId, bookmarkDto.CategoryId.Value);
+
+                if (category == null)
+                {
+                    return BookmarkCreateResult.InvalidCategory;
+                }
+            }
+
+            Bookmark bookmark = new()
+            {
+                Title = title,
+                Url = normalizedUrl,
+                Description = bookmarkDto.Description?.Trim(),
+                CategoryId = bookmarkDto.CategoryId,
+                UserId = userId,
+                DateAdded = DateTime.UtcNow,
+                IsFavorite = false
+            };
+
+            await bookmarkRepository.AddAsync(bookmark);
+
+            return BookmarkCreateResult.Success;
         }
     }
 }

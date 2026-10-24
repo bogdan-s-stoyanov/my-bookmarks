@@ -1,13 +1,13 @@
 ﻿using MyBookmarks.Services.DTOs.Bookmark;
 using MyBookmarks.Services.DTOs.Pagination;
-using System;
-using System.Collections.Generic;
-using System.Text;
+using MyBookmarks.Services.Results;
 
 namespace MyBookmarks.Services.Contracts
 {
     public interface IBookmarkService
     {
         Task<PagedResultDto<BookmarkListItemDto>> GetUserBookmarksAsync(string userId, int pageNumber);
+
+        Task<BookmarkCreateResult> CreateAsync(string userId, BookmarkCreateDto bookmarkDto);
     }
 }

@@ -146,5 +146,27 @@ namespace MyBookmarks.Services
                 Name = category.Name
             };
         }
+
+        public async Task<List<CategoryListItemDto>> GetOptionsAsync(string userId)
+        {
+            int count = await categoryRepository
+                .CountCategoriesForUserAsync(userId);
+
+            // Skip fetching categories when the user has none.
+            if (count == 0)
+            {
+                return new List<CategoryListItemDto>();
+            }
+
+            List<Category> categories = await categoryRepository
+                .GetCategoriesByUserIdAsync(userId, count, skip: 0);
+
+            return categories.Select(c => new CategoryListItemDto
+            {
+                Id = c.Id,
+                Name = c.Name
+            })
+            .ToList();
+        }
     }
 }

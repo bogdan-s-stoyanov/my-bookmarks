@@ -12,5 +12,11 @@ namespace MyBookmarks.Data.Repositories.Contracts
         Task<int> CountBookmarksForUserAsync(string userId);
 
         Task AddAsync(Bookmark bookmark);
+
+        Task<bool> ExistsByIdAsync(string userId, int id);
+
+        Task<bool> ExistsByUrlAsync(string userId, string url);
+
+        Task<bool> ExistsByTitleAsync(string userId, string title);
     }
 }
