@@ -47,7 +47,7 @@ namespace MyBookmarks.Services
                         Url = b.Url,
                         Description = b.Description,
                         CategoryName = b.Category?.Name,
-                        IsFavourite = b.IsFavorite
+                        IsFavorite = b.IsFavorite
                     })
                     .ToList(),
 
@@ -109,6 +109,81 @@ namespace MyBookmarks.Services
             await bookmarkRepository.AddAsync(bookmark);
 
             return BookmarkCreateResult.Success;
+        }
+
+        public async Task<BookmarkEditDto?> GetForEditAsync(string userId, int id)
+        {
+            Bookmark? bookmark = await bookmarkRepository
+                .GetByIdAsync(userId, id);
+
+            if (bookmark == null)
+            {
+                return null;
+            }
+
+            return new BookmarkEditDto
+            {
+                Id = bookmark.Id,
+                Title = bookmark.Title,
+                Url = bookmark.Url,
+                Description = bookmark.Description,
+                CategoryId = bookmark.CategoryId
+            };
+        }
+
+        public async Task<BookmarkEditResult> EditAsync(string userId, BookmarkEditDto bookmarkEditDto)
+        {
+            Bookmark? bookmark = await bookmarkRepository
+                .GetByIdAsync(userId, bookmarkEditDto.Id);
+
+            if (bookmark == null)
+            {
+                return BookmarkEditResult.NotFound;
+            }
+
+            if (!UrlHelper.TryNormalize(bookmarkEditDto.Url, out string normalizedUrl))
+            {
+                return BookmarkEditResult.InvalidUrl;
+            }
+
+            if (normalizedUrl.Length > BookmarkValidationConstants.UrlMaxLength)
+            {
+                return BookmarkEditResult.InvalidUrl;
+            }
+
+            string title = bookmarkEditDto.Title.Trim();
+
+            if (await bookmarkRepository
+                .ExistsByTitleExceptIdAsync(userId, title, bookmarkEditDto.Id))
+            {
+                return BookmarkEditResult.DuplicateTitle;
+            }
+
+            if (await bookmarkRepository
+                .ExistsByUrlExceptIdAsync(userId, normalizedUrl, bookmarkEditDto.Id))
+            {
+                return BookmarkEditResult.DuplicateUrl;
+            }
+
+            if (bookmarkEditDto.CategoryId.HasValue)
+            {
+                Category? category = await categoryRepository
+                    .GetById(userId, bookmarkEditDto.CategoryId.Value);
+
+                if (category == null)
+                {
+                    return BookmarkEditResult.InvalidCategory;
+                }
+            }
+
+            bookmark.Title = title;
+            bookmark.Url = normalizedUrl;
+            bookmark.Description = bookmarkEditDto.Description?.Trim();
+            bookmark.CategoryId = bookmarkEditDto.CategoryId;
+
+            await bookmarkRepository.UpdateAsync(bookmark);
+
+            return BookmarkEditResult.Success;
         }
     }
 }

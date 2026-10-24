@@ -54,7 +54,7 @@ namespace MyBookmarks.Controllers
                         Url = b.Url,
                         Description = b.Description,
                         CategoryName = b.CategoryName,
-                        IsFavorite = b.IsFavourite
+                        IsFavorite = b.IsFavorite
                     })
                     .ToList(),
 
@@ -108,6 +108,7 @@ namespace MyBookmarks.Controllers
             if (!ModelState.IsValid)
             {
                 await this.PopulateCategoriesAsync(userId, bookCreateViewModel);
+                return View(bookCreateViewModel);
             }
 
             BookmarkCreateDto bookmarkCreateDto = new()
@@ -160,8 +161,125 @@ namespace MyBookmarks.Controllers
             }
 
             await this.PopulateCategoriesAsync(userId, bookCreateViewModel);
-
             return View(bookCreateViewModel);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> Edit(int id)
+        {
+            if (id <= 0)
+            {
+                return BadRequest("Invalid bookmark id.");
+            }
+
+            string? userId =
+                User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            if (userId == null)
+            {
+                return Challenge();
+            }
+
+            BookmarkEditDto? bookmark = await bookmarkService
+                .GetForEditAsync(userId, id);
+
+            if (bookmark == null)
+            {
+                return NotFound();
+            }
+
+            List<CategoryListItemDto> categories = await categoryService
+                .GetOptionsAsync(userId);
+
+            BookmarkEditViewModel model = new BookmarkEditViewModel
+            {
+                Id = bookmark.Id,
+                Title = bookmark.Title,
+                Url = bookmark.Url,
+                Description = bookmark.Description,
+                CategoryId = bookmark.CategoryId,
+
+                Categories = categories
+            .Select(c => new CategoryListItemViewModel
+            {
+                Id = c.Id,
+                Name = c.Name
+            })
+            .ToList()
+            };
+
+            return View(model);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Edit(BookmarkEditViewModel bookmarkEditViewModel)
+        {
+            string? userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            if (userId == null)
+            {
+                return Challenge();
+            }
+
+            if (!ModelState.IsValid)
+            {
+                await PopulateCategoriesAsync(userId, bookmarkEditViewModel);
+                return View(bookmarkEditViewModel);
+            }
+
+            BookmarkEditDto dto = new BookmarkEditDto
+            {
+                Id = bookmarkEditViewModel.Id,
+                Title = bookmarkEditViewModel.Title,
+                Url = bookmarkEditViewModel.Url,
+                Description = bookmarkEditViewModel.Description,
+                CategoryId = bookmarkEditViewModel.CategoryId
+            };
+
+            BookmarkEditResult result = await bookmarkService
+                .EditAsync(userId, dto);
+
+            if (result == BookmarkEditResult.NotFound)
+            {
+                return NotFound();
+            }
+
+            if (result == BookmarkEditResult.Success)
+            {
+                return RedirectToAction(nameof(Index));
+            }
+
+            switch (result)
+            {
+                case BookmarkEditResult.InvalidUrl:
+                {
+                    ModelState.AddModelError(nameof(bookmarkEditViewModel.Url), "Enter a valid HTTP or HTTPS URL within the allowed length.");
+                    break;
+                }
+                case BookmarkEditResult.DuplicateTitle:
+                {
+                    ModelState.AddModelError(nameof(bookmarkEditViewModel.Title), "You already have a bookmark with this title.");
+                    break;
+                }
+                case BookmarkEditResult.DuplicateUrl:
+                {
+                    ModelState.AddModelError(nameof(bookmarkEditViewModel.Url), "You have already saved this URL.");
+                    break;
+                }
+                case BookmarkEditResult.InvalidCategory:
+                {
+                    ModelState.AddModelError(nameof(bookmarkEditViewModel.CategoryId), "Select one of your categories.");
+                    break;
+                }
+                default:
+                {
+                    ModelState.AddModelError(string.Empty, "The bookmark could not be updated.");
+                    break;
+                }
+            }
+
+            await PopulateCategoriesAsync(userId, bookmarkEditViewModel);
+            return View(bookmarkEditViewModel);
         }
 
         private async Task PopulateCategoriesAsync(string userId,
@@ -171,6 +289,20 @@ namespace MyBookmarks.Controllers
                 await categoryService.GetOptionsAsync(userId);
 
             bookmarkCreateViewModel.Categories = categories
+                .Select(c => new CategoryListItemViewModel
+                {
+                    Id = c.Id,
+                    Name = c.Name
+                })
+                .ToList();
+        }
+
+        private async Task PopulateCategoriesAsync(string userId, BookmarkEditViewModel model)
+        {
+            List<CategoryListItemDto> categories = await categoryService
+                .GetOptionsAsync(userId);
+
+            model.Categories = categories
                 .Select(c => new CategoryListItemViewModel
                 {
                     Id = c.Id,

@@ -18,5 +18,13 @@ namespace MyBookmarks.Data.Repositories.Contracts
         Task<bool> ExistsByUrlAsync(string userId, string url);
 
         Task<bool> ExistsByTitleAsync(string userId, string title);
+
+        Task<Bookmark?> GetByIdAsync(string userId, int id);
+
+        Task UpdateAsync(Bookmark bookmark);
+
+        Task<bool> ExistsByTitleExceptIdAsync(string userId, string title, int excludedId);
+
+        Task<bool> ExistsByUrlExceptIdAsync(string userId, string url, int excludedId);
     }
 }

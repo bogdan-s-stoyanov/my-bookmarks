@@ -9,5 +9,9 @@ namespace MyBookmarks.Services.Contracts
         Task<PagedResultDto<BookmarkListItemDto>> GetUserBookmarksAsync(string userId, int pageNumber);
 
         Task<BookmarkCreateResult> CreateAsync(string userId, BookmarkCreateDto bookmarkDto);
+
+        Task<BookmarkEditDto?> GetForEditAsync(string userId, int id);
+
+        Task<BookmarkEditResult> EditAsync(string userId, BookmarkEditDto bookmarkEditDto);
     }
 }

@@ -16,6 +16,6 @@ namespace MyBookmarks.Services.DTOs.Bookmark
 
         public string? CategoryName { get; set; }
 
-        public bool IsFavourite { get; set; }
+        public bool IsFavorite { get; set; }
     }
 }
