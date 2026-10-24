@@ -32,7 +32,7 @@ namespace MyBookmarks.Services
 
             int skip = (pageNumber - 1) * pageSize;
 
-            List<Bookmark> bookmarks = await bookmarkRepository.GetBookmarksByUserIdAsync(userId, totalPagesCount, skip);
+            List<Bookmark> bookmarks = await bookmarkRepository.GetBookmarksByUserIdAsync(userId, pageSize, skip);
 
             return new PagedResultDto<BookmarkListItemDto>
             {
