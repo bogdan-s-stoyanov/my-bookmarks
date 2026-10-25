@@ -52,5 +52,29 @@ namespace MyBookmarks.Services
                 PageSize = pageSize
             };
         }
+
+        public async Task<bool> TryCreateAsync(string userId, CollectionCreateDto dto)
+        {
+            string name = dto.Name.Trim();
+
+            bool alreadyExists = await this.collectionRepository
+                .ExistsByNameAsync(userId, name);
+
+            if (alreadyExists)
+            {
+                return false;
+            }
+
+            Collection collection = new Collection
+            {
+                Name = name,
+                Description = dto.Description?.Trim(),
+                UserId = userId
+            };
+
+            await collectionRepository.AddAsync(collection);
+
+            return true;
+        }
     }
 }

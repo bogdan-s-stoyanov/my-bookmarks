@@ -9,5 +9,9 @@ namespace MyBookmarks.Data.Repositories.Contracts
             (string userId, int take, int skip);
 
         Task<int> CountCollectionsForUserAsync(string userId);
+
+        Task<bool> ExistsByNameAsync(string userId, string name);
+
+        Task AddAsync(Collection collection);
     }
 }

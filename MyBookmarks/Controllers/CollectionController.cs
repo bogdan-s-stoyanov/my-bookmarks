@@ -56,5 +56,44 @@ namespace MyBookmarks.Controllers
 
             return View(model);
         }
+
+        [HttpGet]
+        public IActionResult Create()
+        {
+            return View(new CollectionCreateViewModel());
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Create(CollectionCreateViewModel model)
+        {
+            if (!ModelState.IsValid)
+            {
+                return View(model);
+            }
+
+            string? userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            if (userId == null)
+            {
+                return Challenge();
+            }
+
+            CollectionCreateDto dto = new CollectionCreateDto
+            {
+                Name = model.Name,
+                Description = model.Description
+            };
+
+            bool created = await this.collectionService
+                .TryCreateAsync(userId, dto);
+
+            if (!created)
+            {
+                ModelState.AddModelError(nameof(model.Name), "You already have a collection with this name.");
+                return View(model);
+            }
+
+            return RedirectToAction(nameof(Index));
+        }
     }
 }

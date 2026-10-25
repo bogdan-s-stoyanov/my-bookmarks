@@ -33,5 +33,17 @@ namespace MyBookmarks.Data.Repositories
                 .Take(take)
                 .ToListAsync();
         }
+
+        public async Task AddAsync(Collection collection)
+        {
+            dbContext.Collections.Add(collection);
+            await dbContext.SaveChangesAsync();
+        }
+
+        public async Task<bool> ExistsByNameAsync(string userId, string name)
+        {
+            return await dbContext.Collections
+                .AnyAsync(c => c.UserId == userId && c.Name == name);
+        }
     }
 }

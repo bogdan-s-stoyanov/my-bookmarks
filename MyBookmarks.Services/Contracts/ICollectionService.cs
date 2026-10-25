@@ -10,5 +10,7 @@ namespace MyBookmarks.Services.Contracts
     {
         Task<PagedResultDto<CollectionListItemDto>>
             GetUserCollectionsAsync(string userId, int pageNumber);
+
+        Task<bool> TryCreateAsync(string userId, CollectionCreateDto dto);
     }
 }
