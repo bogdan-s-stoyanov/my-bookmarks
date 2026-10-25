@@ -1,0 +1,38 @@
+﻿@model CollectionIndexViewModel
+
+@{
+    ViewData["Title"] = "My collections";
+}
+
+<h1 class="h2 mb-4">@ViewData["Title"]</h1>
+
+@if (Model.Collections.Count == 0)
+{
+    <div class="alert alert-info">
+        You haven't created any collections yet.
+    </div>
+}
+else
+{
+    <div class="row g-4">
+        @foreach (var collection in Model.Collections)
+        {
+            <div class="col-12 col-md-6 col-xl-4">
+                <article class="card h-100 shadow-sm">
+                    <div class="card-body">
+                        <h2 class="h5 text-break">
+                            @collection.Name
+                        </h2>
+
+                        @if (!string.IsNullOrWhiteSpace(collection.Description))
+                        {
+                            <p class="text-muted text-break mb-0">
+                                @collection.Description
+                            </p>
+                        }
+                    </div>
+                </article>
+            </div>
+        }
+    </div>
+}

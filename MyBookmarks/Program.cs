@@ -53,6 +53,8 @@ namespace MyBookmarks
             builder.Services.AddScoped<ICategoryService, CategoryService>();
             builder.Services.AddScoped<IBookmarkRepository, BookmarkRepository>();
             builder.Services.AddScoped<IBookmarkService, BookmarkService>();
+            builder.Services.AddScoped<ICollectionRepository, CollectionRepository>();
+            builder.Services.AddScoped<ICollectionService, CollectionService>();
 
             WebApplication app = builder.Build();
 
