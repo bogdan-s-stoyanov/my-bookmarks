@@ -1,0 +1,41 @@
+﻿@model CollectionDeleteViewModel
+
+@{
+    ViewData["Title"] = "Delete collection";
+}
+
+<div class="row justify-content-center">
+    <div class="col-12 col-md-8 col-lg-6">
+        <div class="card shadow-sm">
+            <div class="card-body p-4">
+                <h1 class="h3 mb-4">@ViewData["Title"]</h1>
+
+                <p>
+                    Are you sure you want to delete
+                    <strong>@Model.Name</strong>?
+                </p>
+
+                <p class="text-muted">
+                    Your bookmarks will remain saved.
+                    Only this collection and its bookmark memberships
+                    will be removed.
+                </p>
+
+                <form asp-controller="Collection"
+                      asp-action="Delete"
+                      method="post">
+                    <input asp-for="Id" type="hidden" />
+
+                    <button type="submit" class="btn btn-danger">
+                        Delete
+                    </button>
+
+                    <a asp-action="Index"
+                       class="btn btn-outline-secondary">
+                        Cancel
+                    </a>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

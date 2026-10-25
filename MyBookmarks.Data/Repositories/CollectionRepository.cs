@@ -63,5 +63,11 @@ namespace MyBookmarks.Data.Repositories
             dbContext.Collections.Update(collection);
             await dbContext.SaveChangesAsync();
         }
+
+        public async Task DeleteAsync(Collection collection)
+        {
+            dbContext.Collections.Remove(collection);
+            await dbContext.SaveChangesAsync();
+        }
     }
 }

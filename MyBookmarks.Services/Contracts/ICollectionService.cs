@@ -17,5 +17,9 @@ namespace MyBookmarks.Services.Contracts
         Task<CollectionEditDto?> GetForEditAsync(string userId, int id);
 
         Task<CollectionEditResult> EditAsync(string userId, CollectionEditDto dto);
+
+        Task<CollectionDeleteDto?> GetForDeleteAsync(string userId, int id);
+
+        Task<bool> TryDeleteAsync(string userId, int id);
     }
 }

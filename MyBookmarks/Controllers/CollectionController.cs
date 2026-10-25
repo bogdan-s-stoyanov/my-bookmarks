@@ -168,5 +168,63 @@ namespace MyBookmarks.Controllers
 
             return RedirectToAction(nameof(Index));
         }
+
+        [HttpGet]
+        public async Task<IActionResult> Delete(int id)
+        {
+            if (id <= 0)
+            {
+                return BadRequest("Invalid collection id.");
+            }
+
+            string? userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            if (userId == null)
+            {
+                return Challenge();
+            }
+
+            CollectionDeleteDto? collection = await collectionService
+                .GetForDeleteAsync(userId, id);
+
+            if (collection == null)
+            {
+                return NotFound();
+            }
+
+            CollectionDeleteViewModel model = new CollectionDeleteViewModel
+            {
+                Id = collection.Id,
+                Name = collection.Name
+            };
+
+            return View(model);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Delete(CollectionDeleteViewModel model)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest("Invalid collection id.");
+            }
+
+            string? userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            if (userId == null)
+            {
+                return Challenge();
+            }
+
+            bool deleted = await collectionService
+                .TryDeleteAsync(userId, model.Id);
+
+            if (!deleted)
+            {
+                return NotFound();
+            }
+
+            return RedirectToAction(nameof(Index));
+        }
     }
 }

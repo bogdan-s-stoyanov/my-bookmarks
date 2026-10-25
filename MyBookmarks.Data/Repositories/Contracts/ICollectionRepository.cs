@@ -19,5 +19,7 @@ namespace MyBookmarks.Data.Repositories.Contracts
         Task<bool> ExistsByNameExceptIdAsync(string userId, string name, int excludedId);
 
         Task UpdateAsync(Collection collection);
+
+        Task DeleteAsync(Collection collection);
     }
 }

@@ -123,5 +123,37 @@ namespace MyBookmarks.Services
 
             return CollectionEditResult.Success;
         }
+
+        public async Task<CollectionDeleteDto?> GetForDeleteAsync(string userId, int id)
+        {
+            Collection? collection = await collectionRepository
+                .GetByIdAsync(userId, id);
+
+            if (collection == null)
+            {
+                return null;
+            }
+
+            return new CollectionDeleteDto
+            {
+                Id = collection.Id,
+                Name = collection.Name
+            };
+        }
+
+        public async Task<bool> TryDeleteAsync(string userId, int id)
+        {
+            Collection? collection = await collectionRepository
+                .GetByIdAsync(userId, id);
+
+            if (collection == null)
+            {
+                return false;
+            }
+
+            await collectionRepository.DeleteAsync(collection);
+
+            return true;
+        }
     }
 }

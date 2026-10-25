@@ -34,6 +34,12 @@ else
                            class="btn btn-outline-secondary mt-3">
                             Edit
                         </a>
+
+                        <a asp-action="Delete"
+                           asp-route-id="@collection.Id"
+                           class="btn btn-outline-danger mt-3">
+                            Delete
+                        </a>
                     </div>
                 </article>
             </div>
