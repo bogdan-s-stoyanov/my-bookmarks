@@ -24,13 +24,16 @@ else
                         <h2 class="h5 text-break">
                             @collection.Name
                         </h2>
-
                         @if (!string.IsNullOrWhiteSpace(collection.Description))
                         {
                             <p class="text-muted text-break mb-0">
                                 @collection.Description
                             </p>
                         }
+                        <a asp-action="Edit" asp-route-id="@collection.Id"
+                           class="btn btn-outline-secondary mt-3">
+                            Edit
+                        </a>
                     </div>
                 </article>
             </div>

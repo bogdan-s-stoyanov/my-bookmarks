@@ -4,6 +4,7 @@ using MyBookmarks.Data.Repositories.Contracts;
 using MyBookmarks.Services.Contracts;
 using MyBookmarks.Services.DTOs.Collection;
 using MyBookmarks.Services.DTOs.Pagination;
+using MyBookmarks.Services.Results;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -75,6 +76,52 @@ namespace MyBookmarks.Services
             await collectionRepository.AddAsync(collection);
 
             return true;
+        }
+
+        public async Task<CollectionEditDto?> GetForEditAsync(string userId, int id)
+        {
+            Collection? collection = await collectionRepository
+                .GetByIdAsync(userId, id);
+
+            if (collection == null)
+            {
+                return null;
+            }
+
+            return new CollectionEditDto
+            {
+                Id = collection.Id,
+                Name = collection.Name,
+                Description = collection.Description
+            };
+        }
+
+        public async Task<CollectionEditResult> EditAsync(string userId, CollectionEditDto dto)
+        {
+            Collection? collection = await this.collectionRepository
+                .GetByIdAsync(userId, dto.Id);
+
+            if (collection == null)
+            {
+                return CollectionEditResult.NotFound;
+            }
+
+            string name = dto.Name.Trim();
+
+            bool nameExists = await this.collectionRepository
+                .ExistsByNameExceptIdAsync(userId, name, dto.Id);
+
+            if (nameExists)
+            {
+                return CollectionEditResult.DuplicateName;
+            }
+
+            collection.Name = name;
+            collection.Description = dto.Description?.Trim();
+
+            await collectionRepository.UpdateAsync(collection);
+
+            return CollectionEditResult.Success;
         }
     }
 }

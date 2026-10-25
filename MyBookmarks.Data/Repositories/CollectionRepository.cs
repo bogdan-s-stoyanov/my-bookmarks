@@ -45,5 +45,23 @@ namespace MyBookmarks.Data.Repositories
             return await dbContext.Collections
                 .AnyAsync(c => c.UserId == userId && c.Name == name);
         }
+
+        public async Task<Collection?> GetByIdAsync(string userId, int id)
+        {
+            return await dbContext.Collections
+                .FirstOrDefaultAsync(c => c.UserId == userId && c.Id == id);
+        }
+
+        public async Task<bool> ExistsByNameExceptIdAsync(string userId, string name, int excludedId)
+        {
+            return await dbContext.Collections
+                .AnyAsync(c => c.UserId == userId && c.Name == name && c.Id != excludedId);
+        }
+
+        public async Task UpdateAsync(Collection collection)
+        {
+            dbContext.Collections.Update(collection);
+            await dbContext.SaveChangesAsync();
+        }
     }
 }
