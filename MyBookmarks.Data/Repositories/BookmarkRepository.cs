@@ -83,5 +83,11 @@ namespace MyBookmarks.Data.Repositories
             return dbContext.Bookmarks
                 .AnyAsync(b => b.UserId == userId && b.Url == url && b.Id != excludedId);
         }
+
+        public async Task DeleteAsync(Bookmark bookmark)
+        {
+            dbContext.Bookmarks.Remove(bookmark);
+            await dbContext.SaveChangesAsync();
+        }
     }
 }

@@ -26,5 +26,7 @@ namespace MyBookmarks.Data.Repositories.Contracts
         Task<bool> ExistsByTitleExceptIdAsync(string userId, string title, int excludedId);
 
         Task<bool> ExistsByUrlExceptIdAsync(string userId, string url, int excludedId);
+
+        Task DeleteAsync(Bookmark bookmark);
     }
 }

@@ -1,6 +1,7 @@
 ﻿using Humanizer;
 using Microsoft.AspNetCore.Mvc;
 using MyBookmarks.Common;
+using MyBookmarks.Data.Models;
 using MyBookmarks.Services.Contracts;
 using MyBookmarks.Services.DTOs.Bookmark;
 using MyBookmarks.Services.DTOs.Category;
@@ -252,34 +253,92 @@ namespace MyBookmarks.Controllers
             switch (result)
             {
                 case BookmarkEditResult.InvalidUrl:
-                {
-                    ModelState.AddModelError(nameof(bookmarkEditViewModel.Url), "Enter a valid HTTP or HTTPS URL within the allowed length.");
-                    break;
-                }
+                    {
+                        ModelState.AddModelError(nameof(bookmarkEditViewModel.Url), "Enter a valid HTTP or HTTPS URL within the allowed length.");
+                        break;
+                    }
                 case BookmarkEditResult.DuplicateTitle:
-                {
-                    ModelState.AddModelError(nameof(bookmarkEditViewModel.Title), "You already have a bookmark with this title.");
-                    break;
-                }
+                    {
+                        ModelState.AddModelError(nameof(bookmarkEditViewModel.Title), "You already have a bookmark with this title.");
+                        break;
+                    }
                 case BookmarkEditResult.DuplicateUrl:
-                {
-                    ModelState.AddModelError(nameof(bookmarkEditViewModel.Url), "You have already saved this URL.");
-                    break;
-                }
+                    {
+                        ModelState.AddModelError(nameof(bookmarkEditViewModel.Url), "You have already saved this URL.");
+                        break;
+                    }
                 case BookmarkEditResult.InvalidCategory:
-                {
-                    ModelState.AddModelError(nameof(bookmarkEditViewModel.CategoryId), "Select one of your categories.");
-                    break;
-                }
+                    {
+                        ModelState.AddModelError(nameof(bookmarkEditViewModel.CategoryId), "Select one of your categories.");
+                        break;
+                    }
                 default:
-                {
-                    ModelState.AddModelError(string.Empty, "The bookmark could not be updated.");
-                    break;
-                }
+                    {
+                        ModelState.AddModelError(string.Empty, "The bookmark could not be updated.");
+                        break;
+                    }
             }
 
             await PopulateCategoriesAsync(userId, bookmarkEditViewModel);
             return View(bookmarkEditViewModel);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> Delete(int id)
+        {
+            if (id == 0)
+            {
+                return BadRequest();
+            }
+
+            string? userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            if (userId == null)
+            {
+                return Challenge();
+            }
+
+            BookmarkDeleteDto? bookmark = await bookmarkService
+                .GetForDeleteAsync(userId, id);
+
+            if (bookmark == null)
+            {
+                return NotFound();
+            }
+
+            BookmarkDeleteViewModel model = new BookmarkDeleteViewModel
+            {
+                Id = bookmark.Id,
+                Title = bookmark.Title
+            };
+
+            return View(model);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Delete(BookmarkDeleteViewModel model)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest("Invalid bookmark id.");
+            }
+
+            string? userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            if (userId == null)
+            {
+                return Challenge();
+            }
+
+            bool deleted = await this.bookmarkService
+                .TryDeleteAsync(userId, model.Id);
+
+            if (!deleted)
+            {
+                return NotFound();
+            }
+
+            return RedirectToAction(nameof(Index));
         }
 
         private async Task PopulateCategoriesAsync(string userId,

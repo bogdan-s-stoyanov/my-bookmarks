@@ -15,7 +15,7 @@ namespace MyBookmarks.Services
         private readonly IBookmarkRepository bookmarkRepository;
         private readonly ICategoryRepository categoryRepository;
 
-        public BookmarkService(IBookmarkRepository bookmarkRepository, 
+        public BookmarkService(IBookmarkRepository bookmarkRepository,
             ICategoryRepository categoryRepository)
         {
             this.bookmarkRepository = bookmarkRepository;
@@ -184,6 +184,37 @@ namespace MyBookmarks.Services
             await bookmarkRepository.UpdateAsync(bookmark);
 
             return BookmarkEditResult.Success;
+        }
+
+        public async Task<BookmarkDeleteDto?> GetForDeleteAsync(string userId, int id)
+        {
+            Bookmark? bookmark = await bookmarkRepository.GetByIdAsync(userId, id);
+
+            if (bookmark == null)
+            {
+                return null;
+            }
+
+            return new BookmarkDeleteDto
+            {
+                Id = bookmark.Id,
+                Title = bookmark.Title
+            };
+        }
+
+        public async Task<bool> TryDeleteAsync(string userId, int id)
+        {
+            Bookmark? bookmark = await bookmarkRepository
+                .GetByIdAsync(userId, id);
+
+            if (bookmark == null)
+            {
+                return false;
+            }
+
+            await bookmarkRepository.DeleteAsync(bookmark);
+
+            return true;
         }
     }
 }
