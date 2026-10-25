@@ -24,21 +24,26 @@ else
                             <h2 class="h5 text-break">
                                 @bookmark.Title
                             </h2>
+                            <form asp-controller="Bookmark"
+                                  asp-action="ToggleFavorite"
+                                  method="post"
+                                  class="flex-shrink-0">
+                                <input type="hidden" name="id" value="@bookmark.Id" />
+                                <input type="hidden" name="pageNumber" value="@Model.PageNumber" />
 
-                            @if (bookmark.IsFavorite)
-                            {
-                                <span class="text-warning"
-                                      role="img"
-                                      aria-label="Favorite">
-                                    ★
-                                </span>
-                            }
+                                <button type="submit"
+                                        class="btn btn-link text-decoration-none fs-4 p-0 @(bookmark.IsFavorite ? "text-danger" : "text-secondary")"
+                                        aria-label="@(bookmark.IsFavorite ? "Remove from favorites" : "Add to favorites")"
+                                        aria-pressed="@(bookmark.IsFavorite ? "true" : "false")">
+                                    <span aria-hidden="true">
+                                        @(bookmark.IsFavorite ? "♥" : "♡")
+                                    </span>
+                                </button>
+                            </form>
                         </div>
-
                         <p class="small text-muted text-break">
                             @bookmark.Url
                         </p>
-
                         <p class="text-muted">
                             @(bookmark.CategoryName ?? "Uncategorized")
                         </p>

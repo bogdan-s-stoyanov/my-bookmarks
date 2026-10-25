@@ -216,5 +216,22 @@ namespace MyBookmarks.Services
 
             return true;
         }
+
+        public async Task<bool> ToggleFavoriteAsync(string userId, int id)
+        {
+            Bookmark? bookmark = await bookmarkRepository
+                .GetByIdAsync(userId, id);
+
+            if (bookmark == null)
+            {
+                return false;
+            }
+
+            bookmark.IsFavorite = !bookmark.IsFavorite;
+
+            await bookmarkRepository.UpdateAsync(bookmark);
+
+            return true;
+        }
     }
 }

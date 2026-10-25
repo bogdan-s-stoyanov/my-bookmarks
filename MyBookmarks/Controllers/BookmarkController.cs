@@ -341,6 +341,32 @@ namespace MyBookmarks.Controllers
             return RedirectToAction(nameof(Index));
         }
 
+        [HttpPost]
+        public async Task<IActionResult> ToggleFavorite(int id, int pageNumber = 1)
+        {
+            if (id <= 0)
+            {
+                return BadRequest("Invalid bookmark id.");
+            }
+
+            string? userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            if (userId == null)
+            {
+                return Challenge();
+            }
+
+            bool updated = await bookmarkService
+                .ToggleFavoriteAsync(userId, id);
+
+            if (!updated)
+            {
+                return NotFound();
+            }
+
+            return RedirectToAction(nameof(Index), new { pageNumber });
+        }
+
         private async Task PopulateCategoriesAsync(string userId,
             BookmarkCreateViewModel bookmarkCreateViewModel)
         {
