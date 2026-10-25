@@ -2,11 +2,11 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace MyBookmarks.Services.DTOs
+namespace MyBookmarks.Services.DTOs.Pagination
 {
-    public class CategoryPageDto 
+    public class PagedResultDto<T>
     {
-        public List<CategoryListItemDto> Categories { get; set; } = new();
+        public List<T> Items = new();
 
         public int TotalCount { get; set; }
 

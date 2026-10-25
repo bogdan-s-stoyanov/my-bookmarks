@@ -3,7 +3,8 @@ using MyBookmarks.Common;
 using MyBookmarks.Data.Models;
 using MyBookmarks.Data.Repositories.Contracts;
 using MyBookmarks.Services.Contracts;
-using MyBookmarks.Services.DTOs;
+using MyBookmarks.Services.DTOs.Category;
+using MyBookmarks.Services.DTOs.Pagination;
 using MyBookmarks.Services.Results;
 
 namespace MyBookmarks.Services
@@ -17,7 +18,7 @@ namespace MyBookmarks.Services
             this.categoryRepository = categoryRepository;
         }
 
-        public async Task<CategoryPageDto> GetUserCategoriesAsync(string userId, int pageNumber)
+        public async Task<PagedResultDto<CategoryListItemDto>> GetUserCategoriesAsync(string userId, int pageNumber)
         {
             if (pageNumber < 1)
             {
@@ -39,9 +40,9 @@ namespace MyBookmarks.Services
             List<Category> categories = await categoryRepository
                 .GetCategoriesByUserIdAsync(userId, pageSize, skipped);
 
-            return new CategoryPageDto
+            return new PagedResultDto<CategoryListItemDto>
             {
-                Categories = categories
+                Items = categories
                     .Select(c => new CategoryListItemDto
                     {
                         Id = c.Id,
@@ -144,6 +145,28 @@ namespace MyBookmarks.Services
                 Id = category.Id,
                 Name = category.Name
             };
+        }
+
+        public async Task<List<CategoryListItemDto>> GetOptionsAsync(string userId)
+        {
+            int count = await categoryRepository
+                .CountCategoriesForUserAsync(userId);
+
+            // Skip fetching categories when the user has none.
+            if (count == 0)
+            {
+                return new List<CategoryListItemDto>();
+            }
+
+            List<Category> categories = await categoryRepository
+                .GetCategoriesByUserIdAsync(userId, count, skip: 0);
+
+            return categories.Select(c => new CategoryListItemDto
+            {
+                Id = c.Id,
+                Name = c.Name
+            })
+            .ToList();
         }
     }
 }

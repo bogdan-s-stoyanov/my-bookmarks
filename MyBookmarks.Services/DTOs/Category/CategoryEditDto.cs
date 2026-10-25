@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace MyBookmarks.Services.DTOs
+namespace MyBookmarks.Services.DTOs.Category
 {
-    public class CategoryDeleteDto
+    public class CategoryEditDto
     {
         public int Id { get; set; }
 

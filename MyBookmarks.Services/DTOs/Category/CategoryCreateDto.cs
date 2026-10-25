@@ -2,12 +2,10 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace MyBookmarks.Services.DTOs
+namespace MyBookmarks.Services.DTOs.Category
 {
-    public class CategoryListItemDto
+    public class CategoryCreateDto
     {
-        public int Id { get; set; }
-
         public string Name { get; set; } = null!;
     }
 }

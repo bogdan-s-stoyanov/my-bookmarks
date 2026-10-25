@@ -1,11 +1,12 @@
-﻿using MyBookmarks.Services.DTOs;
+﻿using MyBookmarks.Services.DTOs.Category;
+using MyBookmarks.Services.DTOs.Pagination;
 using MyBookmarks.Services.Results;
 
 namespace MyBookmarks.Services.Contracts
 {
     public interface ICategoryService
     {
-        Task<CategoryPageDto> GetUserCategoriesAsync(string userId, int pageNumber);
+        Task<PagedResultDto<CategoryListItemDto>> GetUserCategoriesAsync(string userId, int pageNumber);
 
         Task<bool> TryCreateAsync(string userId, CategoryCreateDto dto);
 
@@ -16,5 +17,7 @@ namespace MyBookmarks.Services.Contracts
         Task<bool> TryDeleteAsync(string userId, int id);
 
         Task<CategoryDeleteDto?> GetForDeleteAsync(string userId, int id);
+
+        Task<List<CategoryListItemDto>> GetOptionsAsync(string userId);
     }
 }
