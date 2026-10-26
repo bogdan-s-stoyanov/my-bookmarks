@@ -16,17 +16,33 @@ namespace MyBookmarks.Data.Repositories
             this.dbContext = dbContext;
         }
 
-        public async Task<int> CountBookmarksForUserAsync(string userId)
+        public async Task<int> CountBookmarksForUserAsync(
+            string userId, string? searchTerm = null)
         {
-            return await dbContext.Bookmarks
-                .CountAsync(c => c.UserId == userId);
+            IQueryable<Bookmark> query = dbContext.Bookmarks
+                .Where(b => b.UserId == userId);
+
+            if (!string.IsNullOrWhiteSpace(searchTerm))
+            {
+                query = query.Where(b => b.Title.Contains(searchTerm));
+            }
+
+            return await query.CountAsync();
         }
 
-        public async Task<List<Bookmark>> GetBookmarksByUserIdAsync(string userId, int take, int skip)
+        public async Task<List<Bookmark>> GetBookmarksByUserIdAsync(
+            string userId, int take, int skip, string? searchTerm = null)
         {
-            return await dbContext.Bookmarks
+            IQueryable<Bookmark> query = dbContext.Bookmarks
                 .AsNoTracking()
-                .Where(b => b.UserId == userId)
+                .Where(b => b.UserId == userId);
+
+            if (!string.IsNullOrWhiteSpace(searchTerm))
+            {
+                query = query.Where(b => b.Title.Contains(searchTerm));
+            }
+
+            return await query
                 .Include(b => b.Category)
                 .OrderByDescending(b => b.DateAdded)
                 .ThenByDescending(b => b.Id)

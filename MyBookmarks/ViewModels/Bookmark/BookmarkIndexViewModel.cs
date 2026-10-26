@@ -14,5 +14,7 @@ namespace MyBookmarks.ViewModels.Bookmark
 
         public int TotalPages
             => (int)Math.Ceiling((double)TotalCount / PageSize);
+
+        public string? SearchTerm { get; set; }
     }
 }

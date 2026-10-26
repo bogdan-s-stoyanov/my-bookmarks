@@ -26,13 +26,14 @@ namespace MyBookmarks.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> Index(int pageNumber = 1)
+        public async Task<IActionResult> Index(
+            int pageNumber = 1, string? searchTerm = null)
         {
             int maxPageNumber = int.MaxValue / PageConstants.BookmarksPageSize;
 
             if (pageNumber < 1 || pageNumber > maxPageNumber)
             {
-                return BadRequest("Invalid page number");
+                return BadRequest("Invalid page number.");
             }
 
             string? userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
@@ -42,8 +43,11 @@ namespace MyBookmarks.Controllers
                 return Challenge();
             }
 
+            searchTerm = searchTerm?.Trim();
+
             PagedResultDto<BookmarkListItemDto> page =
-                await bookmarkService.GetUserBookmarksAsync(userId, pageNumber);
+                await this.bookmarkService
+                    .GetUserBookmarksAsync(userId, pageNumber, searchTerm);
 
             BookmarkIndexViewModel model = new()
             {
@@ -61,7 +65,8 @@ namespace MyBookmarks.Controllers
 
                 PageNumber = page.PageNumber,
                 TotalCount = page.TotalCount,
-                PageSize = page.PageSize
+                PageSize = page.PageSize,
+                SearchTerm = searchTerm
             };
 
             return View(model);
@@ -342,7 +347,8 @@ namespace MyBookmarks.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> ToggleFavorite(int id, int pageNumber = 1)
+        public async Task<IActionResult> ToggleFavorite(
+            int id, int pageNumber = 1, string? searchTerm = null)
         {
             if (id <= 0)
             {
@@ -364,7 +370,8 @@ namespace MyBookmarks.Controllers
                 return NotFound();
             }
 
-            return RedirectToAction(nameof(Index), new { pageNumber });
+            return RedirectToAction(
+                nameof(Index), new { pageNumber, searchTerm });
         }
 
         private async Task PopulateCategoriesAsync(string userId,

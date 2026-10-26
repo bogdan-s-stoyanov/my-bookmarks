@@ -22,12 +22,15 @@ namespace MyBookmarks.Services
             this.categoryRepository = categoryRepository;
         }
 
-        public async Task<PagedResultDto<BookmarkListItemDto>> GetUserBookmarksAsync(string userId, int pageNumber)
+        public async Task<PagedResultDto<BookmarkListItemDto>> GetUserBookmarksAsync(
+            string userId, int pageNumber, string? searchTerm = null)
         {
+            searchTerm = searchTerm?.Trim();
+
             int pageSize = PageConstants.BookmarksPageSize;
 
             int totalBookmarksCount = await bookmarkRepository
-                .CountBookmarksForUserAsync(userId);
+                .CountBookmarksForUserAsync(userId, searchTerm);
 
             int totalPagesCount = Math.Max(1, (int)Math.Ceiling((double)totalBookmarksCount / pageSize));
 
@@ -35,7 +38,8 @@ namespace MyBookmarks.Services
 
             int skip = (pageNumber - 1) * pageSize;
 
-            List<Bookmark> bookmarks = await bookmarkRepository.GetBookmarksByUserIdAsync(userId, pageSize, skip);
+            List<Bookmark> bookmarks = await this.bookmarkRepository
+                .GetBookmarksByUserIdAsync(userId, pageSize, skip, searchTerm);
 
             return new PagedResultDto<BookmarkListItemDto>
             {
@@ -56,7 +60,6 @@ namespace MyBookmarks.Services
                 PageSize = pageSize
             };
         }
-
 
         public async Task<BookmarkCreateResult> CreateAsync(string userId, BookmarkCreateDto bookmarkDto)
         {
