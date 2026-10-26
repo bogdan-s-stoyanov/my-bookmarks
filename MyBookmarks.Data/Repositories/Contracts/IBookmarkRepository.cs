@@ -1,4 +1,5 @@
-﻿using MyBookmarks.Data.Models;
+using MyBookmarks.Common.Enums;
+using MyBookmarks.Data.Models;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -7,9 +8,15 @@ namespace MyBookmarks.Data.Repositories.Contracts
 {
     public interface IBookmarkRepository
     {
-        Task<List<Bookmark>> GetBookmarksByUserIdAsync(string userId, int take, int skip);
+        Task<List<Bookmark>> GetBookmarksByUserIdAsync(
+            string userId, int take, int skip,
+            string? searchTerm = null, int? categoryId = null,
+            bool onlyFavorites = false,
+            BookmarkSortOrder sortOrder = BookmarkSortOrder.TitleAscending);
 
-        Task<int> CountBookmarksForUserAsync(string userId);
+        Task<int> CountBookmarksForUserAsync(
+            string userId, string? searchTerm = null,
+            int? categoryId = null, bool onlyFavorites = false);
 
         Task AddAsync(Bookmark bookmark);
 
@@ -33,5 +40,6 @@ namespace MyBookmarks.Data.Repositories.Contracts
             int take, int skip);
 
         Task<int> CountByCollectionAsync(string userId, int collectionId);
+
     }
 }

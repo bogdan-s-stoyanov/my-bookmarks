@@ -1,4 +1,5 @@
-﻿using MyBookmarks.Services.DTOs.Bookmark;
+using MyBookmarks.Common.Enums;
+using MyBookmarks.Services.DTOs.Bookmark;
 using MyBookmarks.Services.DTOs.Pagination;
 using MyBookmarks.Services.Results;
 
@@ -6,7 +7,11 @@ namespace MyBookmarks.Services.Contracts
 {
     public interface IBookmarkService
     {
-        Task<PagedResultDto<BookmarkListItemDto>> GetUserBookmarksAsync(string userId, int pageNumber);
+        Task<PagedResultDto<BookmarkListItemDto>> GetUserBookmarksAsync(
+             string userId, int pageNumber,
+             string? searchTerm = null, int? categoryId = null,
+             bool onlyFavorites = false,
+             BookmarkSortOrder sortOrder = BookmarkSortOrder.TitleAscending);
 
         Task<BookmarkCreateResult> CreateAsync(string userId, BookmarkCreateDto bookmarkDto);
 

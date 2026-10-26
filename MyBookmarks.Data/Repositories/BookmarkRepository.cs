@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
+using MyBookmarks.Common.Enums;
 using MyBookmarks.Data.Models;
 using MyBookmarks.Data.Repositories.Contracts;
 using System;
@@ -16,20 +17,90 @@ namespace MyBookmarks.Data.Repositories
             this.dbContext = dbContext;
         }
 
-        public async Task<int> CountBookmarksForUserAsync(string userId)
+        public async Task<int> CountBookmarksForUserAsync(
+            string userId, string? searchTerm = null, 
+            int? categoryId = null, bool onlyFavorites = false)
         {
-            return await dbContext.Bookmarks
-                .CountAsync(c => c.UserId == userId);
+            IQueryable<Bookmark> query = dbContext.Bookmarks
+                .Where(b => b.UserId == userId);
+
+            if (!string.IsNullOrWhiteSpace(searchTerm))
+            {
+                query = query.Where(b => b.Title.Contains(searchTerm));
+            }
+
+            if (onlyFavorites)
+            {
+                query = query.Where(b => b.IsFavorite);
+            }
+
+            if (categoryId.HasValue)
+            {
+                query = query.Where(b => b.CategoryId == categoryId.Value);
+            }
+
+            return await query.CountAsync();
         }
 
-        public async Task<List<Bookmark>> GetBookmarksByUserIdAsync(string userId, int take, int skip)
+        public async Task<List<Bookmark>> GetBookmarksByUserIdAsync(
+            string userId, int take, int skip,
+            string? searchTerm = null, int? categoryId = null,
+            bool onlyFavorites = false,
+            BookmarkSortOrder sortOrder = BookmarkSortOrder.TitleAscending)
         {
-            return await dbContext.Bookmarks
+            IQueryable<Bookmark> query = dbContext.Bookmarks
                 .AsNoTracking()
-                .Where(b => b.UserId == userId)
+                .Where(b => b.UserId == userId);
+
+            if (!string.IsNullOrWhiteSpace(searchTerm))
+            {
+                query = query.Where(b => b.Title.Contains(searchTerm));
+            }
+
+            if (onlyFavorites)
+            {
+                query = query.Where(b => b.IsFavorite);
+            }
+
+            if (categoryId.HasValue)
+            {
+                query = query.Where(b => b.CategoryId == categoryId.Value);
+            }
+
+            switch (sortOrder)
+            {
+                case BookmarkSortOrder.Oldest:
+                {
+                    query = query
+                        .OrderBy(b => b.DateAdded)
+                        .ThenBy(b => b.Id);
+                    break;
+                }
+                case BookmarkSortOrder.TitleAscending:
+                {
+                    query = query
+                        .OrderBy(b => b.Title)
+                        .ThenBy(b => b.Id);
+                    break;
+                }
+                case BookmarkSortOrder.TitleDescending:
+                {
+                    query = query
+                        .OrderByDescending(b => b.Title)
+                        .ThenByDescending(b => b.Id);
+                    break;
+                }
+                default:
+                {
+                    query = query
+                        .OrderByDescending(b => b.DateAdded)
+                        .ThenByDescending(b => b.Id);
+                    break;
+                }
+            }
+
+            return await query
                 .Include(b => b.Category)
-                .OrderByDescending(b => b.DateAdded)
-                .ThenByDescending(b => b.Id)
                 .Skip(skip)
                 .Take(take)
                 .ToListAsync();

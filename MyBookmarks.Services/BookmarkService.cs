@@ -1,5 +1,7 @@
-﻿using MyBookmarks.Common;
+using Microsoft.Data.SqlClient;
+using MyBookmarks.Common;
 using MyBookmarks.Common.EntityValidation;
+using MyBookmarks.Common.Enums;
 using MyBookmarks.Data.Models;
 using MyBookmarks.Data.Repositories.Contracts;
 using MyBookmarks.Services.Contracts;
@@ -22,12 +24,18 @@ namespace MyBookmarks.Services
             this.categoryRepository = categoryRepository;
         }
 
-        public async Task<PagedResultDto<BookmarkListItemDto>> GetUserBookmarksAsync(string userId, int pageNumber)
+        public async Task<PagedResultDto<BookmarkListItemDto>> GetUserBookmarksAsync(
+             string userId, int pageNumber,
+             string? searchTerm = null, int? categoryId = null,
+             bool onlyFavorites = false,
+             BookmarkSortOrder sortOrder = BookmarkSortOrder.TitleAscending)
         {
+            searchTerm = searchTerm?.Trim();
+
             int pageSize = PageConstants.BookmarksPageSize;
 
             int totalBookmarksCount = await bookmarkRepository
-                .CountBookmarksForUserAsync(userId);
+                .CountBookmarksForUserAsync(userId, searchTerm, categoryId, onlyFavorites);
 
             int totalPagesCount = Math.Max(1, (int)Math.Ceiling((double)totalBookmarksCount / pageSize));
 
@@ -35,7 +43,9 @@ namespace MyBookmarks.Services
 
             int skip = (pageNumber - 1) * pageSize;
 
-            List<Bookmark> bookmarks = await bookmarkRepository.GetBookmarksByUserIdAsync(userId, pageSize, skip);
+            List<Bookmark> bookmarks = await bookmarkRepository
+                .GetBookmarksByUserIdAsync(userId, pageSize, skip, 
+                    searchTerm, categoryId, onlyFavorites, sortOrder);
 
             return new PagedResultDto<BookmarkListItemDto>
             {
@@ -47,16 +57,15 @@ namespace MyBookmarks.Services
                         Url = b.Url,
                         Description = b.Description,
                         CategoryName = b.Category?.Name,
-                        IsFavorite = b.IsFavorite
+                        IsFavorite = b.IsFavorite,
                     })
                     .ToList(),
 
                 TotalCount = totalBookmarksCount,
                 PageNumber = pageNumber,
-                PageSize = pageSize
+                PageSize = pageSize,
             };
         }
-
 
         public async Task<BookmarkCreateResult> CreateAsync(string userId, BookmarkCreateDto bookmarkDto)
         {
@@ -103,7 +112,7 @@ namespace MyBookmarks.Services
                 CategoryId = bookmarkDto.CategoryId,
                 UserId = userId,
                 DateAdded = DateTime.UtcNow,
-                IsFavorite = false
+                IsFavorite = false,
             };
 
             await bookmarkRepository.AddAsync(bookmark);

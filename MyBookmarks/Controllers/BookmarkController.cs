@@ -1,6 +1,7 @@
-﻿using Humanizer;
+using Humanizer;
 using Microsoft.AspNetCore.Mvc;
 using MyBookmarks.Common;
+using MyBookmarks.Common.Enums;
 using MyBookmarks.Data.Models;
 using MyBookmarks.Services.Contracts;
 using MyBookmarks.Services.DTOs.Bookmark;
@@ -26,13 +27,26 @@ namespace MyBookmarks.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> Index(int pageNumber = 1)
+        public async Task<IActionResult> Index(
+            int pageNumber = 1, string? searchTerm = null, 
+            int? categoryId = null, bool onlyFavorites = false,
+            BookmarkSortOrder sortOrder = BookmarkSortOrder.TitleAscending)
         {
+            if (!Enum.IsDefined(sortOrder))
+            {
+                return BadRequest("Invalid sort order.");
+            }
+
             int maxPageNumber = int.MaxValue / PageConstants.BookmarksPageSize;
 
             if (pageNumber < 1 || pageNumber > maxPageNumber)
             {
-                return BadRequest("Invalid page number");
+                return BadRequest("Invalid page number.");
+            }
+
+            if (categoryId.HasValue && categoryId.Value <= 0)
+            {
+                return BadRequest("Invalid category id.");
             }
 
             string? userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
@@ -42,8 +56,19 @@ namespace MyBookmarks.Controllers
                 return Challenge();
             }
 
-            PagedResultDto<BookmarkListItemDto> page =
-                await bookmarkService.GetUserBookmarksAsync(userId, pageNumber);
+            List<CategoryListItemDto> categories = await categoryService
+                .GetOptionsAsync(userId);
+
+            if (categoryId.HasValue && !categories.Any(c => c.Id == categoryId.Value))
+            {
+                return NotFound();
+            }
+
+            searchTerm = searchTerm?.Trim();
+
+            PagedResultDto<BookmarkListItemDto> page = await bookmarkService
+                .GetUserBookmarksAsync(userId, pageNumber, searchTerm, 
+                categoryId, onlyFavorites, sortOrder);
 
             BookmarkIndexViewModel model = new()
             {
@@ -59,9 +84,21 @@ namespace MyBookmarks.Controllers
                     })
                     .ToList(),
 
+                Categories = categories
+                    .Select(c => new CategoryListItemViewModel
+                    {
+                        Id = c.Id,
+                        Name = c.Name
+                    })
+                    .ToList(),
+
                 PageNumber = page.PageNumber,
                 TotalCount = page.TotalCount,
-                PageSize = page.PageSize
+                PageSize = page.PageSize,
+                SearchTerm = searchTerm,
+                CategoryId = categoryId,
+                OnlyFavorites = onlyFavorites,
+                SortOrder = sortOrder
             };
 
             return View(model);
@@ -342,7 +379,10 @@ namespace MyBookmarks.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> ToggleFavorite(int id, int pageNumber = 1)
+        public async Task<IActionResult> ToggleFavorite(
+            int id, int pageNumber = 1, string? searchTerm = null, 
+            int? categoryId = null, bool onlyFavorites = false, 
+            BookmarkSortOrder sortOrder = BookmarkSortOrder.TitleAscending)
         {
             if (id <= 0)
             {
@@ -364,7 +404,9 @@ namespace MyBookmarks.Controllers
                 return NotFound();
             }
 
-            return RedirectToAction(nameof(Index), new { pageNumber });
+            return RedirectToAction(
+                nameof(Index), new { pageNumber, searchTerm, categoryId, 
+                    onlyFavorites, sortOrder });
         }
 
         private async Task PopulateCategoriesAsync(string userId,
