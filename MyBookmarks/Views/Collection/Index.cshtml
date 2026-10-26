@@ -50,3 +50,31 @@ else
         }
     </div>
 }
+
+@if (Model.TotalPages > 1)
+{
+    <nav class="d-flex flex-wrap justify-content-center align-items-center gap-3 mt-4"
+         aria-label="Collection pages">
+        @if (Model.PageNumber > 1)
+        {
+            <a asp-action="Index"
+               asp-route-pageNumber="@(Model.PageNumber - 1)"
+               class="btn btn-outline-primary">
+                Previous
+            </a>
+        }
+
+        <span>
+            Page @Model.PageNumber of @Model.TotalPages
+        </span>
+
+        @if (Model.PageNumber < Model.TotalPages)
+        {
+            <a asp-action="Index"
+               asp-route-pageNumber="@(Model.PageNumber + 1)"
+               class="btn btn-outline-primary">
+                Next
+            </a>
+        }
+    </nav>
+}

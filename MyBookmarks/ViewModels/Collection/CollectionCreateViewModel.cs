@@ -9,6 +9,7 @@ namespace MyBookmarks.ViewModels.Collection
         [MaxLength(CollectionValidationConstants.NameMaxLength)]
         public string Name { get; set; } = null!;
 
+        [MaxLength(CollectionValidationConstants.DescriptionMaxLength)]
         public string? Description { get; set; }
     }
 }
