@@ -21,5 +21,7 @@ namespace MyBookmarks.ViewModels.Bookmark
         public int? CategoryId { get; set; }
 
         public List<CategoryListItemViewModel> Categories { get; set; } = new();
+
+        public bool OnlyFavorites { get; set; }
     }
 }

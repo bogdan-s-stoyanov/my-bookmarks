@@ -17,7 +17,8 @@ namespace MyBookmarks.Data.Repositories
         }
 
         public async Task<int> CountBookmarksForUserAsync(
-            string userId, string? searchTerm = null, int? categoryId = null)
+            string userId, string? searchTerm = null, 
+            int? categoryId = null, bool onlyFavorites = false)
         {
             IQueryable<Bookmark> query = dbContext.Bookmarks
                 .Where(b => b.UserId == userId);
@@ -25,6 +26,11 @@ namespace MyBookmarks.Data.Repositories
             if (!string.IsNullOrWhiteSpace(searchTerm))
             {
                 query = query.Where(b => b.Title.Contains(searchTerm));
+            }
+
+            if (onlyFavorites)
+            {
+                query = query.Where(b => b.IsFavorite);
             }
 
             if (categoryId.HasValue)
@@ -37,7 +43,7 @@ namespace MyBookmarks.Data.Repositories
 
         public async Task<List<Bookmark>> GetBookmarksByUserIdAsync(
             string userId, int take, int skip,
-            string? searchTerm = null, int? categoryId = null)
+            string? searchTerm = null, int? categoryId = null, bool onlyFavorites = false)
         {
             IQueryable<Bookmark> query = dbContext.Bookmarks
                 .AsNoTracking()
@@ -46,6 +52,11 @@ namespace MyBookmarks.Data.Repositories
             if (!string.IsNullOrWhiteSpace(searchTerm))
             {
                 query = query.Where(b => b.Title.Contains(searchTerm));
+            }
+
+            if (onlyFavorites)
+            {
+                query = query.Where(b => b.IsFavorite);
             }
 
             if (categoryId.HasValue)

@@ -27,7 +27,8 @@ namespace MyBookmarks.Controllers
 
         [HttpGet]
         public async Task<IActionResult> Index(
-            int pageNumber = 1, string? searchTerm = null, int? categoryId = null)
+            int pageNumber = 1, string? searchTerm = null, 
+            int? categoryId = null, bool onlyFavorites = false)
         {
             int maxPageNumber = int.MaxValue / PageConstants.BookmarksPageSize;
 
@@ -59,7 +60,7 @@ namespace MyBookmarks.Controllers
             searchTerm = searchTerm?.Trim();
 
             PagedResultDto<BookmarkListItemDto> page = await bookmarkService
-                .GetUserBookmarksAsync(userId, pageNumber, searchTerm, categoryId);
+                .GetUserBookmarksAsync(userId, pageNumber, searchTerm, categoryId, onlyFavorites);
 
             BookmarkIndexViewModel model = new()
             {
@@ -87,7 +88,8 @@ namespace MyBookmarks.Controllers
                 TotalCount = page.TotalCount,
                 PageSize = page.PageSize,
                 SearchTerm = searchTerm,
-                CategoryId = categoryId
+                CategoryId = categoryId,
+                OnlyFavorites = onlyFavorites
             };
 
             return View(model);
@@ -370,7 +372,7 @@ namespace MyBookmarks.Controllers
         [HttpPost]
         public async Task<IActionResult> ToggleFavorite(
             int id, int pageNumber = 1, 
-            string? searchTerm = null, int? categoryId = null)
+            string? searchTerm = null, int? categoryId = null, bool onlyFavorites = false)
         {
             if (id <= 0)
             {
@@ -393,7 +395,7 @@ namespace MyBookmarks.Controllers
             }
 
             return RedirectToAction(
-                nameof(Index), new { pageNumber, searchTerm, categoryId });
+                nameof(Index), new { pageNumber, searchTerm, categoryId, onlyFavorites });
         }
 
         private async Task PopulateCategoriesAsync(string userId,

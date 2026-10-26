@@ -8,7 +8,8 @@ namespace MyBookmarks.Services.Contracts
     {
         Task<PagedResultDto<BookmarkListItemDto>> GetUserBookmarksAsync(
             string userId, int pageNumber,
-            string? searchTerm = null, int? categoryId = null);
+            string? searchTerm = null, int? categoryId = null,
+            bool onlyFavorites = false);
 
         Task<BookmarkCreateResult> CreateAsync(string userId, BookmarkCreateDto bookmarkDto);
 

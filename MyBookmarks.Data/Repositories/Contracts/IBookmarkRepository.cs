@@ -8,11 +8,13 @@ namespace MyBookmarks.Data.Repositories.Contracts
     public interface IBookmarkRepository
     {
         Task<List<Bookmark>> GetBookmarksByUserIdAsync(
-            string userId, int take, int skip, 
-            string? searchTerm = null, int? categoryId = null);
+            string userId, int take, int skip,
+            string? searchTerm = null, int? categoryId = null,
+            bool onlyFavorites = false);
 
-        Task<int> CountBookmarksForUserAsync
-            (string userId, string? searchTerm = null, int? categoryId = null);
+        Task<int> CountBookmarksForUserAsync(
+            string userId, string? searchTerm = null,
+            int? categoryId = null, bool onlyFavorites = false);
 
         Task AddAsync(Bookmark bookmark);
 

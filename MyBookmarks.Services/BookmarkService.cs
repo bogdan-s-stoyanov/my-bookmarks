@@ -24,7 +24,7 @@ namespace MyBookmarks.Services
 
         public async Task<PagedResultDto<BookmarkListItemDto>> GetUserBookmarksAsync
             (string userId, int pageNumber,
-            string? searchTerm = null, int? categoryId = null)
+            string? searchTerm = null, int? categoryId = null, bool onlyFavorites = false)
         {
             searchTerm = searchTerm?.Trim();
 
@@ -40,7 +40,7 @@ namespace MyBookmarks.Services
             int skip = (pageNumber - 1) * pageSize;
 
             List<Bookmark> bookmarks = await bookmarkRepository
-                .GetBookmarksByUserIdAsync(userId, pageSize, skip, searchTerm, categoryId);
+                .GetBookmarksByUserIdAsync(userId, pageSize, skip, searchTerm, categoryId, onlyFavorites);
 
             return new PagedResultDto<BookmarkListItemDto>
             {
