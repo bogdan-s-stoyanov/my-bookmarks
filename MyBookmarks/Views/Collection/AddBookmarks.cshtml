@@ -1,0 +1,99 @@
+﻿@model CollectionAddBookmarksViewModel
+
+@{
+    ViewData["Title"] = "Add bookmarks to collection";
+}
+
+<h1 class="h3 mb-3">@ViewData["Title"]</h1>
+
+<p class="text-muted text-break">@Model.CollectionName</p>
+
+<a asp-action="Details"
+   asp-route-id="@Model.CollectionId"
+   class="btn btn-outline-secondary mb-4">
+    Back to collection
+</a>
+
+@if (Model.BookmarksPage.Bookmarks.Count == 0)
+{
+    <div class="alert alert-info">
+        You haven't saved any bookmarks yet.
+    </div>
+}
+else
+{
+    <ul class="list-group">
+        @foreach (var bookmark in Model.BookmarksPage.Bookmarks)
+        {
+            <li class="list-group-item">
+                <div class="d-flex flex-wrap justify-content-between align-items-center gap-3">
+                    <div>
+                        <h2 class="h5 text-break">@bookmark.Title</h2>
+
+                        <p class="small text-muted text-break mb-0">
+                            @bookmark.Url
+                        </p>
+                    </div>
+
+                    @if (Model.IncludedBookmarkIds.Contains(bookmark.Id))
+                    {
+                        <span class="badge bg-success">
+                            Already added
+                        </span>
+                    }
+                    else
+                    {
+                        <form asp-action="AddBookmark" method="post">
+                            <input type="hidden"
+                                   name="collectionId"
+                                   value="@Model.CollectionId" />
+
+                            <input type="hidden"
+                                   name="bookmarkId"
+                                   value="@bookmark.Id" />
+
+                            <input type="hidden"
+                                   name="pageNumber"
+                                   value="@Model.BookmarksPage.PageNumber" />
+
+                            <button type="submit" class="btn btn-primary">
+                                Add to collection
+                            </button>
+                        </form>
+                    }
+                </div>
+            </li>
+        }
+    </ul>
+}
+
+@if (Model.BookmarksPage.TotalPages > 1)
+{
+    <nav class="d-flex flex-wrap justify-content-center align-items-center gap-3 mt-4"
+         aria-label="Bookmark selection pages">
+        @if (Model.BookmarksPage.PageNumber > 1)
+        {
+            <a asp-action="AddBookmarks"
+               asp-route-id="@Model.CollectionId"
+               asp-route-pageNumber="@(Model.BookmarksPage.PageNumber - 1)"
+               class="btn btn-outline-primary">
+                Previous
+            </a>
+        }
+
+        <span>
+            Page @Model.BookmarksPage.PageNumber
+            of @Model.BookmarksPage.TotalPages
+        </span>
+
+        @if (Model.BookmarksPage.PageNumber < Model.BookmarksPage.TotalPages)
+        {
+            <a asp-action="AddBookmarks"
+               asp-route-id="@Model.CollectionId"
+               asp-route-pageNumber="@(Model.BookmarksPage.PageNumber + 1)"
+               class="btn btn-outline-primary">
+                Next
+            </a>
+        }
+    </nav>
+}

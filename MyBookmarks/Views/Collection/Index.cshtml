@@ -1,0 +1,52 @@
+﻿@model CollectionIndexViewModel
+
+@{
+    ViewData["Title"] = "My collections";
+}
+
+<h1 class="h2 mb-4">@ViewData["Title"]</h1>
+<a asp-action="Create" class="btn btn-primary mb-3"> Create collection </a>
+
+@if (Model.Collections.Count == 0)
+{
+    <div class="alert alert-info">
+        You haven't created any collections yet.
+    </div>
+}
+else
+{
+    <div class="row g-4">
+        @foreach (var collection in Model.Collections)
+        {
+            <div class="col-12 col-md-6 col-xl-4">
+                <article class="card h-100 shadow-sm">
+                    <div class="card-body">
+                        <h2 class="h5 text-break">
+                            @collection.Name
+                        </h2>
+                        @if (!string.IsNullOrWhiteSpace(collection.Description))
+                        {
+                            <p class="text-muted text-break mb-0">
+                                @collection.Description
+                            </p>
+                        }
+                        <a asp-action="Details"
+                           asp-route-id="@collection.Id"
+                           class="btn btn-outline-primary mt-3">
+                            Open collection
+                        </a>
+                        <a asp-action="Edit" asp-route-id="@collection.Id"
+                           class="btn btn-outline-secondary mt-3">
+                            Edit
+                        </a>
+                        <a asp-action="Delete"
+                           asp-route-id="@collection.Id"
+                           class="btn btn-outline-danger mt-3">
+                            Delete
+                        </a>
+                    </div>
+                </article>
+            </div>
+        }
+    </div>
+}
