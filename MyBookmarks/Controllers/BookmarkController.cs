@@ -1,6 +1,7 @@
-﻿using Humanizer;
+using Humanizer;
 using Microsoft.AspNetCore.Mvc;
 using MyBookmarks.Common;
+using MyBookmarks.Common.Enums;
 using MyBookmarks.Data.Models;
 using MyBookmarks.Services.Contracts;
 using MyBookmarks.Services.DTOs.Bookmark;
@@ -28,8 +29,14 @@ namespace MyBookmarks.Controllers
         [HttpGet]
         public async Task<IActionResult> Index(
             int pageNumber = 1, string? searchTerm = null, 
-            int? categoryId = null, bool onlyFavorites = false)
+            int? categoryId = null, bool onlyFavorites = false,
+            BookmarkSortOrder sortOrder = BookmarkSortOrder.TitleAscending)
         {
+            if (!Enum.IsDefined(sortOrder))
+            {
+                return BadRequest("Invalid sort order.");
+            }
+
             int maxPageNumber = int.MaxValue / PageConstants.BookmarksPageSize;
 
             if (pageNumber < 1 || pageNumber > maxPageNumber)
@@ -60,7 +67,8 @@ namespace MyBookmarks.Controllers
             searchTerm = searchTerm?.Trim();
 
             PagedResultDto<BookmarkListItemDto> page = await bookmarkService
-                .GetUserBookmarksAsync(userId, pageNumber, searchTerm, categoryId, onlyFavorites);
+                .GetUserBookmarksAsync(userId, pageNumber, searchTerm, 
+                categoryId, onlyFavorites, sortOrder);
 
             BookmarkIndexViewModel model = new()
             {
@@ -89,7 +97,8 @@ namespace MyBookmarks.Controllers
                 PageSize = page.PageSize,
                 SearchTerm = searchTerm,
                 CategoryId = categoryId,
-                OnlyFavorites = onlyFavorites
+                OnlyFavorites = onlyFavorites,
+                SortOrder = sortOrder
             };
 
             return View(model);
@@ -371,8 +380,9 @@ namespace MyBookmarks.Controllers
 
         [HttpPost]
         public async Task<IActionResult> ToggleFavorite(
-            int id, int pageNumber = 1, 
-            string? searchTerm = null, int? categoryId = null, bool onlyFavorites = false)
+            int id, int pageNumber = 1, string? searchTerm = null, 
+            int? categoryId = null, bool onlyFavorites = false, 
+            BookmarkSortOrder sortOrder = BookmarkSortOrder.TitleAscending)
         {
             if (id <= 0)
             {
@@ -395,7 +405,8 @@ namespace MyBookmarks.Controllers
             }
 
             return RedirectToAction(
-                nameof(Index), new { pageNumber, searchTerm, categoryId, onlyFavorites });
+                nameof(Index), new { pageNumber, searchTerm, categoryId, 
+                    onlyFavorites, sortOrder });
         }
 
         private async Task PopulateCategoriesAsync(string userId,

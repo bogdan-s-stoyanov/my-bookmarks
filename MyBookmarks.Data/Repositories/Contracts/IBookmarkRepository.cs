@@ -1,4 +1,5 @@
-﻿using MyBookmarks.Data.Models;
+using MyBookmarks.Common.Enums;
+using MyBookmarks.Data.Models;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -10,7 +11,8 @@ namespace MyBookmarks.Data.Repositories.Contracts
         Task<List<Bookmark>> GetBookmarksByUserIdAsync(
             string userId, int take, int skip,
             string? searchTerm = null, int? categoryId = null,
-            bool onlyFavorites = false);
+            bool onlyFavorites = false,
+            BookmarkSortOrder sortOrder = BookmarkSortOrder.TitleAscending);
 
         Task<int> CountBookmarksForUserAsync(
             string userId, string? searchTerm = null,

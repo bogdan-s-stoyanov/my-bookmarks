@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
+using MyBookmarks.Common.Enums;
 using MyBookmarks.Data.Models;
 using MyBookmarks.Data.Repositories.Contracts;
 using System;
@@ -43,7 +44,9 @@ namespace MyBookmarks.Data.Repositories
 
         public async Task<List<Bookmark>> GetBookmarksByUserIdAsync(
             string userId, int take, int skip,
-            string? searchTerm = null, int? categoryId = null, bool onlyFavorites = false)
+            string? searchTerm = null, int? categoryId = null,
+            bool onlyFavorites = false,
+            BookmarkSortOrder sortOrder = BookmarkSortOrder.TitleAscending)
         {
             IQueryable<Bookmark> query = dbContext.Bookmarks
                 .AsNoTracking()
@@ -64,10 +67,40 @@ namespace MyBookmarks.Data.Repositories
                 query = query.Where(b => b.CategoryId == categoryId.Value);
             }
 
+            switch (sortOrder)
+            {
+                case BookmarkSortOrder.Oldest:
+                {
+                    query = query
+                        .OrderBy(b => b.DateAdded)
+                        .ThenBy(b => b.Id);
+                    break;
+                }
+                case BookmarkSortOrder.TitleAscending:
+                {
+                    query = query
+                        .OrderBy(b => b.Title)
+                        .ThenBy(b => b.Id);
+                    break;
+                }
+                case BookmarkSortOrder.TitleDescending:
+                {
+                    query = query
+                        .OrderByDescending(b => b.Title)
+                        .ThenByDescending(b => b.Id);
+                    break;
+                }
+                default:
+                {
+                    query = query
+                        .OrderByDescending(b => b.DateAdded)
+                        .ThenByDescending(b => b.Id);
+                    break;
+                }
+            }
+
             return await query
                 .Include(b => b.Category)
-                .OrderByDescending(b => b.DateAdded)
-                .ThenByDescending(b => b.Id)
                 .Skip(skip)
                 .Take(take)
                 .ToListAsync();
