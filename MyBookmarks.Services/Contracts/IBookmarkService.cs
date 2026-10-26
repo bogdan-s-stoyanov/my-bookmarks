@@ -7,7 +7,8 @@ namespace MyBookmarks.Services.Contracts
     public interface IBookmarkService
     {
         Task<PagedResultDto<BookmarkListItemDto>> GetUserBookmarksAsync(
-            string userId, int pageNumber, string? searchTerm = null);
+            string userId, int pageNumber,
+            string? searchTerm = null, int? categoryId = null);
 
         Task<BookmarkCreateResult> CreateAsync(string userId, BookmarkCreateDto bookmarkDto);
 

@@ -27,13 +27,18 @@ namespace MyBookmarks.Controllers
 
         [HttpGet]
         public async Task<IActionResult> Index(
-            int pageNumber = 1, string? searchTerm = null)
+            int pageNumber = 1, string? searchTerm = null, int? categoryId = null)
         {
             int maxPageNumber = int.MaxValue / PageConstants.BookmarksPageSize;
 
             if (pageNumber < 1 || pageNumber > maxPageNumber)
             {
                 return BadRequest("Invalid page number.");
+            }
+
+            if (categoryId.HasValue && categoryId.Value <= 0)
+            {
+                return BadRequest("Invalid category id.");
             }
 
             string? userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
@@ -43,11 +48,18 @@ namespace MyBookmarks.Controllers
                 return Challenge();
             }
 
+            List<CategoryListItemDto> categories = await categoryService
+                .GetOptionsAsync(userId);
+
+            if (categoryId.HasValue && !categories.Any(c => c.Id == categoryId.Value))
+            {
+                return NotFound();
+            }
+
             searchTerm = searchTerm?.Trim();
 
-            PagedResultDto<BookmarkListItemDto> page =
-                await this.bookmarkService
-                    .GetUserBookmarksAsync(userId, pageNumber, searchTerm);
+            PagedResultDto<BookmarkListItemDto> page = await bookmarkService
+                .GetUserBookmarksAsync(userId, pageNumber, searchTerm, categoryId);
 
             BookmarkIndexViewModel model = new()
             {
@@ -63,10 +75,19 @@ namespace MyBookmarks.Controllers
                     })
                     .ToList(),
 
+                Categories = categories
+                    .Select(c => new CategoryListItemViewModel
+                    {
+                        Id = c.Id,
+                        Name = c.Name
+                    })
+                    .ToList(),
+
                 PageNumber = page.PageNumber,
                 TotalCount = page.TotalCount,
                 PageSize = page.PageSize,
-                SearchTerm = searchTerm
+                SearchTerm = searchTerm,
+                CategoryId = categoryId
             };
 
             return View(model);
@@ -348,7 +369,8 @@ namespace MyBookmarks.Controllers
 
         [HttpPost]
         public async Task<IActionResult> ToggleFavorite(
-            int id, int pageNumber = 1, string? searchTerm = null)
+            int id, int pageNumber = 1, 
+            string? searchTerm = null, int? categoryId = null)
         {
             if (id <= 0)
             {
@@ -371,7 +393,7 @@ namespace MyBookmarks.Controllers
             }
 
             return RedirectToAction(
-                nameof(Index), new { pageNumber, searchTerm });
+                nameof(Index), new { pageNumber, searchTerm, categoryId });
         }
 
         private async Task PopulateCategoriesAsync(string userId,

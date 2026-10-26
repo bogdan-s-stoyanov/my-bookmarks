@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using MyBookmarks.ViewModels.Category;
 
 namespace MyBookmarks.ViewModels.Bookmark
 {
@@ -16,5 +17,9 @@ namespace MyBookmarks.ViewModels.Bookmark
             => (int)Math.Ceiling((double)TotalCount / PageSize);
 
         public string? SearchTerm { get; set; }
+
+        public int? CategoryId { get; set; }
+
+        public List<CategoryListItemViewModel> Categories { get; set; } = new();
     }
 }

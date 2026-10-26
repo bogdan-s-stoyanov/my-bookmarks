@@ -1,40 +1,66 @@
-﻿@model BookmarkIndexViewModel
+﻿@using Microsoft.AspNetCore.Mvc.Rendering
+@model BookmarkIndexViewModel
 
 @{
     ViewData["Title"] = "My bookmarks";
 }
 
-<h1 class="h2 mb-4">@ViewData["Title"]</h1>
+<div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
+    <h1 class="h2 mb-0">@ViewData["Title"]</h1>
 
-<a asp-action="Create" class="btn btn-primary mb-3">
-    Add bookmark
-</a>
+    <a asp-action="Create" class="btn btn-primary">
+        Add bookmark
+    </a>
+</div>
 
 <form asp-action="Index" method="get" class="mb-4">
-    <label asp-for="SearchTerm" class="form-label">
-        Search by title
-    </label>
+    <div class="row g-3 align-items-end">
+        <div class="col-12 col-md-5">
+            <label asp-for="SearchTerm" class="form-label">
+                Search by title
+            </label>
 
-    <div class="d-flex flex-wrap gap-2">
-        <input asp-for="SearchTerm"
-               type="search"
-               class="form-control flex-grow-1 w-auto"
-               placeholder="Enter a bookmark title..." />
+            <input asp-for="SearchTerm"
+                   type="search"
+                   class="form-control"
+                   placeholder="Enter a bookmark title..." />
+        </div>
 
-        <button type="submit" class="btn btn-primary">
-            Search
-        </button>
+        <div class="col-12 col-md-4">
+            <label asp-for="CategoryId" class="form-label">
+                Category
+            </label>
 
-        <a asp-action="Index" class="btn btn-outline-secondary">
-            Clear
-        </a>
+            <select asp-for="CategoryId"
+                    asp-items="@(new SelectList(Model.Categories, "Id", "Name"))"
+                    class="form-select">
+                <option value="">All categories</option>
+            </select>
+        </div>
+
+        <div class="col-12 col-md-3 d-flex gap-2">
+            <button type="submit" class="btn btn-primary">
+                Search
+            </button>
+
+            <a asp-action="Index" class="btn btn-outline-secondary">
+                Clear
+            </a>
+        </div>
     </div>
 </form>
 
 @if (Model.Bookmarks.Count == 0)
 {
     <div class="alert alert-info">
-        You haven't saved any bookmarks yet.
+        @if (!string.IsNullOrWhiteSpace(Model.SearchTerm) || Model.CategoryId.HasValue)
+        {
+            <span>No bookmarks match your search or filters.</span>
+        }
+        else
+        {
+            <span>You haven't saved any bookmarks yet.</span>
+        }
     </div>
 }
 else
@@ -49,13 +75,25 @@ else
                             <h2 class="h5 text-break">
                                 @bookmark.Title
                             </h2>
-                            <form asp-controller="Bookmark"
-                                  asp-action="ToggleFavorite"
+
+                            <form asp-action="ToggleFavorite"
                                   method="post"
                                   class="flex-shrink-0">
-                                <input type="hidden" name="id" value="@bookmark.Id" />
-                                <input type="hidden" name="pageNumber" value="@Model.PageNumber" />
-                                <input type="hidden" name="searchTerm" value="@Model.SearchTerm" />
+                                <input type="hidden"
+                                       name="id"
+                                       value="@bookmark.Id" />
+
+                                <input type="hidden"
+                                       name="pageNumber"
+                                       value="@Model.PageNumber" />
+
+                                <input type="hidden"
+                                       name="searchTerm"
+                                       value="@Model.SearchTerm" />
+
+                                <input type="hidden"
+                                       name="categoryId"
+                                       value="@Model.CategoryId" />
 
                                 <button type="submit"
                                         class="btn btn-link text-decoration-none fs-4 p-0 @(bookmark.IsFavorite ? "text-danger" : "text-secondary")"
@@ -67,9 +105,11 @@ else
                                 </button>
                             </form>
                         </div>
+
                         <p class="small text-muted text-break">
                             @bookmark.Url
                         </p>
+
                         <p class="text-muted">
                             @(bookmark.CategoryName ?? "Uncategorized")
                         </p>
@@ -81,18 +121,20 @@ else
                             </p>
                         }
 
-                        <div class="mt-auto">
+                        <div class="mt-auto d-flex flex-wrap gap-2">
                             <a href="@bookmark.Url"
                                target="_blank"
                                rel="noopener noreferrer"
                                class="btn btn-outline-primary">
                                 Open link
                             </a>
+
                             <a asp-action="Edit"
                                asp-route-id="@bookmark.Id"
                                class="btn btn-outline-secondary">
                                 Edit
                             </a>
+
                             <a asp-action="Delete"
                                asp-route-id="@bookmark.Id"
                                class="btn btn-outline-danger">
@@ -104,4 +146,36 @@ else
             </div>
         }
     </div>
+}
+
+@if (Model.TotalPages > 1)
+{
+    <nav class="d-flex flex-wrap justify-content-center align-items-center gap-3 mt-4"
+         aria-label="Bookmark pages">
+        @if (Model.PageNumber > 1)
+        {
+            <a asp-action="Index"
+               asp-route-pageNumber="@(Model.PageNumber - 1)"
+               asp-route-searchTerm="@Model.SearchTerm"
+               asp-route-categoryId="@Model.CategoryId"
+               class="btn btn-outline-primary">
+                Previous
+            </a>
+        }
+
+        <span>
+            Page @Model.PageNumber of @Model.TotalPages
+        </span>
+
+        @if (Model.PageNumber < Model.TotalPages)
+        {
+            <a asp-action="Index"
+               asp-route-pageNumber="@(Model.PageNumber + 1)"
+               asp-route-searchTerm="@Model.SearchTerm"
+               asp-route-categoryId="@Model.CategoryId"
+               class="btn btn-outline-primary">
+                Next
+            </a>
+        }
+    </nav>
 }
