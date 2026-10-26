@@ -6,6 +6,7 @@ using MyBookmarks.Common;
 using MyBookmarks.Data;
 using MyBookmarks.Data.Repositories;
 using MyBookmarks.Data.Repositories.Contracts;
+using MyBookmarks.Data.Seeding;
 using MyBookmarks.Services;
 using MyBookmarks.Services.Contracts;
 
@@ -15,7 +16,7 @@ namespace MyBookmarks
 {
     public class Program
     {
-        public static void Main(string[] args)
+        public static async Task Main(string[] args)
         {
             WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
@@ -58,6 +59,19 @@ namespace MyBookmarks
 
             WebApplication app = builder.Build();
 
+            if (app.Environment.IsDevelopment())
+            {
+                using IServiceScope scope = app.Services.CreateScope();
+
+                MyBookmarksDbContext dbContext = scope.ServiceProvider
+                    .GetRequiredService<MyBookmarksDbContext>();
+
+                UserManager<IdentityUser> userManager = scope.ServiceProvider
+                    .GetRequiredService<UserManager<IdentityUser>>();
+
+                await DemoDataSeeder.SeedAsync(dbContext, userManager);
+            }
+
             // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())
             {
@@ -84,7 +98,7 @@ namespace MyBookmarks
             app.MapRazorPages()
                .WithStaticAssets();
 
-            app.Run();
+            await app.RunAsync();
         }
     }
 }
