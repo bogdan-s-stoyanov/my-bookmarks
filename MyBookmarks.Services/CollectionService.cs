@@ -2,6 +2,7 @@
 using MyBookmarks.Data.Models;
 using MyBookmarks.Data.Repositories.Contracts;
 using MyBookmarks.Services.Contracts;
+using MyBookmarks.Services.DTOs.Bookmark;
 using MyBookmarks.Services.DTOs.Collection;
 using MyBookmarks.Services.DTOs.Pagination;
 using MyBookmarks.Services.Results;
@@ -14,10 +15,12 @@ namespace MyBookmarks.Services
     public class CollectionService : ICollectionService
     {
         private readonly ICollectionRepository collectionRepository;
+        private readonly IBookmarkRepository bookmarkRepository;
 
-        public CollectionService(ICollectionRepository collectionRepository)
+        public CollectionService(ICollectionRepository collectionRepository, IBookmarkRepository bookmarkRepository)
         {
             this.collectionRepository = collectionRepository;
+            this.bookmarkRepository = bookmarkRepository;
         }
 
         public async Task<PagedResultDto<CollectionListItemDto>> 
@@ -152,6 +155,150 @@ namespace MyBookmarks.Services
             }
 
             await collectionRepository.DeleteAsync(collection);
+
+            return true;
+        }
+
+        public async Task<CollectionDetailsDto?> GetDetailsAsync(string userId, int id, int pageNumber)
+        {
+            Collection? collection = await collectionRepository
+                .GetByIdAsync(userId, id);
+
+            if (collection == null)
+            {
+                return null;
+            }
+
+            int pageSize = PageConstants.BookmarksPageSize;
+
+            int totalCount = await bookmarkRepository
+                .CountByCollectionAsync(userId, id);
+
+            int totalPages = Math.Max(1, (int)Math.Ceiling((double)totalCount / pageSize));
+
+            pageNumber = Math.Clamp(pageNumber, 1, totalPages);
+
+            int skip = (pageNumber - 1) * pageSize;
+
+            List<Bookmark> bookmarks = await bookmarkRepository
+                .GetByCollectionAsync(userId, id, pageSize, skip);
+
+            return new CollectionDetailsDto
+            {
+                Id = collection.Id,
+                Name = collection.Name,
+                Description = collection.Description,
+
+                BookmarksPage = new PagedResultDto<BookmarkListItemDto>
+                {
+                    Items = bookmarks
+                        .Select(b => new BookmarkListItemDto
+                        {
+                            Id = b.Id,
+                            Title = b.Title,
+                            Url = b.Url,
+                            Description = b.Description,
+                            CategoryName = b.Category?.Name,
+                            IsFavorite = b.IsFavorite
+                        })
+                        .ToList(),
+
+                    TotalCount = totalCount,
+                    PageNumber = pageNumber,
+                    PageSize = pageSize
+                }
+            };
+        }
+
+        public async Task<bool> TryAddBookmarkAsync(string userId, int collectionId, int bookmarkId)
+        {
+            Collection? collection = await collectionRepository
+                .GetByIdAsync(userId, collectionId);
+
+            if (collection == null)
+            {
+                return false;
+            }
+
+            Bookmark? bookmark = await bookmarkRepository
+                .GetByIdAsync(userId, bookmarkId);
+
+            if (bookmark == null)
+            {
+                return false;
+            }
+
+            bool alreadyIncluded = await collectionRepository
+                .ContainsBookmarkAsync(collectionId, bookmarkId);
+
+            if (alreadyIncluded)
+            {
+                return true;
+            }
+
+            BookmarkCollection membership = new BookmarkCollection
+            {
+                CollectionId = collectionId,
+                BookmarkId = bookmarkId
+            };
+
+            await collectionRepository.AddBookmarkAsync(membership);
+
+            return true;
+        }
+
+        public async Task<CollectionListItemDto?> GetByIdAsync(string userId, int id)
+        {
+            Collection? collection = await this.collectionRepository
+                .GetByIdAsync(userId, id);
+
+            if (collection == null)
+            {
+                return null;
+            }
+
+            return new CollectionListItemDto
+            {
+                Id = collection.Id,
+                Name = collection.Name,
+                Description = collection.Description
+            };
+        }
+
+        public async Task<List<int>> GetIncludedBookmarkIdsAsync(string userId, int collectionId, List<int> bookmarkIds)
+        {
+            return await collectionRepository.
+                GetIncludedBookmarkIdsAsync(userId, collectionId, bookmarkIds);
+        }
+
+        public async Task<bool> TryRemoveBookmarkAsync(string userId, int collectionId, int bookmarkId)
+        {
+            Collection? collection = await collectionRepository
+                .GetByIdAsync(userId, collectionId);
+
+            if (collection == null)
+            {
+                return false;
+            }
+
+            Bookmark? bookmark = await bookmarkRepository
+                .GetByIdAsync(userId, bookmarkId);
+
+            if (bookmark == null)
+            {
+                return false;
+            }
+
+            BookmarkCollection? membership = await collectionRepository
+                .GetBookmarkCollectionAsync(collectionId, bookmarkId);
+
+            if (membership == null)
+            {
+                return true;
+            }
+
+            await collectionRepository
+                .RemoveBookmarkFromCollection(membership);
 
             return true;
         }

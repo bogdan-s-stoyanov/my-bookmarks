@@ -21,5 +21,16 @@ namespace MyBookmarks.Data.Repositories.Contracts
         Task UpdateAsync(Collection collection);
 
         Task DeleteAsync(Collection collection);
+
+        Task<bool> ContainsBookmarkAsync(int collectionId, int bookmarkId);
+
+        Task AddBookmarkAsync(BookmarkCollection bookmarkCollection);
+
+        Task<BookmarkCollection?> GetBookmarkCollectionAsync(int collectionId, int bookmarkId);
+
+        Task RemoveBookmarkFromCollection(BookmarkCollection bookmarkCollection);
+
+        Task<List<int>> GetIncludedBookmarkIdsAsync
+            (string userId, int collectionId, List<int> bookmarksIds);
     }
 }

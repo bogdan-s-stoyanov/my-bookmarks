@@ -30,11 +30,15 @@ else
                                 @collection.Description
                             </p>
                         }
+                        <a asp-action="Details"
+                           asp-route-id="@collection.Id"
+                           class="btn btn-outline-primary mt-3">
+                            Open collection
+                        </a>
                         <a asp-action="Edit" asp-route-id="@collection.Id"
                            class="btn btn-outline-secondary mt-3">
                             Edit
                         </a>
-
                         <a asp-action="Delete"
                            asp-route-id="@collection.Id"
                            class="btn btn-outline-danger mt-3">

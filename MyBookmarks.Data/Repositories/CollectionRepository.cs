@@ -69,5 +69,51 @@ namespace MyBookmarks.Data.Repositories
             dbContext.Collections.Remove(collection);
             await dbContext.SaveChangesAsync();
         }
+
+        public async Task<bool> ContainsBookmarkAsync(int collectionId, int bookmarkId)
+        {
+            return await dbContext.BookmarkCollections
+                .AnyAsync(bc => bc.CollectionId == collectionId &&
+                    bc.BookmarkId == bookmarkId);
+        }
+
+        public async Task AddBookmarkAsync(BookmarkCollection bookmarkCollection)
+        {
+            dbContext.BookmarkCollections.Add(bookmarkCollection);
+            await dbContext.SaveChangesAsync();
+        }
+
+        public async Task<BookmarkCollection?> GetBookmarkCollectionAsync(int collectionId, int bookmarkId)
+        {
+            return await dbContext.BookmarkCollections
+                .FirstOrDefaultAsync(bc =>
+                    bc.CollectionId == collectionId &&
+                    bc.BookmarkId == bookmarkId);
+        }
+
+        public async Task RemoveBookmarkFromCollection(BookmarkCollection bookmarkCollection)
+        {
+            dbContext.BookmarkCollections.Remove(bookmarkCollection);
+            await dbContext.SaveChangesAsync();
+        }
+
+        public async Task<List<int>> GetIncludedBookmarkIdsAsync(string userId, int collectionId, List<int> bookmarksIds)
+        {
+            if (bookmarksIds.Count == 0)
+            {
+                return new List<int>();
+            }
+
+            return await dbContext.BookmarkCollections
+                .Where(bc =>
+                    bc.CollectionId == collectionId &&
+                    bc.Collection.UserId == userId &&
+                    bc.Bookmark.UserId == userId &&
+                    bookmarksIds.Contains(bc.BookmarkId))
+                .OrderBy(bc => bc.Bookmark.Title)
+                .Take(bookmarksIds.Count)
+                .Select(bc => bc.BookmarkId)
+                .ToListAsync();
+        }
     }
 }

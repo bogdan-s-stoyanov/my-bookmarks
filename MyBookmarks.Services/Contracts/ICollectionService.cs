@@ -21,5 +21,16 @@ namespace MyBookmarks.Services.Contracts
         Task<CollectionDeleteDto?> GetForDeleteAsync(string userId, int id);
 
         Task<bool> TryDeleteAsync(string userId, int id);
+
+        Task<CollectionDetailsDto?> GetDetailsAsync(string userId, int id, int pageNumber);
+
+        Task<bool> TryAddBookmarkAsync(string userId, int collectionId, int bookmarkId);
+
+        Task<CollectionListItemDto?> GetByIdAsync(string userId, int id);
+
+        Task<List<int>> GetIncludedBookmarkIdsAsync
+            (string userId, int collectionId, List<int> bookmarkIds);
+
+        Task<bool> TryRemoveBookmarkAsync(string userId, int collectionId, int bookmarkId);
     }
 }

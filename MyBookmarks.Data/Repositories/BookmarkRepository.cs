@@ -89,5 +89,31 @@ namespace MyBookmarks.Data.Repositories
             dbContext.Bookmarks.Remove(bookmark);
             await dbContext.SaveChangesAsync();
         }
+
+        public Task<List<Bookmark>> GetByCollectionAsync(string userId, int collectionId, int take, int skip)
+        {
+            return dbContext.Bookmarks
+                .AsNoTracking()
+                .Where(b =>
+                    b.UserId == userId &&
+                    b.BookmarkCollections.Any(bc =>
+                        bc.CollectionId == collectionId &&
+                        bc.Collection.UserId == userId))
+                .Include(b => b.Category)
+                .OrderBy(b => b.Title)
+                .ThenBy(b => b.Id)
+                .Skip(skip)
+                .Take(take)
+                .ToListAsync();
+        }
+
+        public async Task<int> CountByCollectionAsync(string userId, int collectionId)
+        {
+            return await dbContext.Bookmarks
+                .CountAsync(b => b.UserId == userId &&
+                    b.BookmarkCollections.Any(bc =>
+                        bc.CollectionId == collectionId &&
+                        bc.Collection.UserId == userId));
+        }
     }
 }
