@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc;
 using MyBookmarks.Common;
 using MyBookmarks.Services.Contracts;
 using MyBookmarks.Services.DTOs.Category;
@@ -9,15 +9,29 @@ using System.Security.Claims;
 
 namespace MyBookmarks.Controllers
 {
+    /// <summary>
+    /// Handles category pages and form submissions for the current user.
+    /// </summary>
     public class CategoryController : Controller
     {
         private readonly ICategoryService categoryService;
 
+        /// <summary>
+        /// Initializes the instance with its required dependencies.
+        /// </summary>
+        /// <param name="categoryService">The service providing category operations.</param>
         public CategoryController(ICategoryService categoryService)
         {
             this.categoryService = categoryService;
         }
 
+        /// <summary>
+        /// Displays a page of the current user's categories.
+        /// </summary>
+        /// <param name="pageNumber">The requested page number, starting at 1.</param>
+        /// <returns>
+        /// The category list, a bad request for an invalid page number, or an authentication challenge if the user ID is unavailable.
+        /// </returns>
         [HttpGet]
         public async Task<IActionResult> Index(int pageNumber = 1)
         {
@@ -56,12 +70,26 @@ namespace MyBookmarks.Controllers
             return View(model);
         }
 
+        /// <summary>
+        /// Displays the category creation form.
+        /// </summary>
+        /// <returns>
+        /// The creation view with an empty input model.
+        /// </returns>
         [HttpGet]
         public IActionResult Create()
         {
             return View(new CategoryCreateViewModel());
         }
 
+        /// <summary>
+        /// Processes the category creation form for the current user.
+        /// </summary>
+        /// <param name="model">The submitted category data.</param>
+        /// <returns>
+        /// A redirect to the category list on success, the form with errors for invalid or duplicate input,
+        /// or an authentication challenge if the user ID is unavailable.
+        /// </returns>
         [HttpPost]
         public async Task<IActionResult> Create(CategoryCreateViewModel model)
         {
@@ -94,6 +122,14 @@ namespace MyBookmarks.Controllers
             return RedirectToAction(nameof(Index));
         }
 
+        /// <summary>
+        /// Displays the edit form for a category owned by the current user.
+        /// </summary>
+        /// <param name="id">The category ID.</param>
+        /// <returns>
+        /// The edit form, a bad request for a non-positive ID, not found for a missing or foreign category,
+        /// or an authentication challenge if the user ID is unavailable.
+        /// </returns>
         [HttpGet]
         public async Task<IActionResult> Edit(int id)
         {
@@ -125,6 +161,14 @@ namespace MyBookmarks.Controllers
             return View(model);
         }
 
+        /// <summary>
+        /// Processes changes to a category owned by the current user.
+        /// </summary>
+        /// <param name="categoryEditViewModel">The category ID and submitted name.</param>
+        /// <returns>
+        /// A redirect to the category list on success, the form with validation or duplicate-name errors,
+        /// not found for a missing or foreign category, or an authentication challenge if the user ID is unavailable.
+        /// </returns>
         [HttpPost]
         public async Task<IActionResult> Edit(CategoryEditViewModel categoryEditViewModel)
         {
@@ -166,6 +210,14 @@ namespace MyBookmarks.Controllers
             return RedirectToAction(nameof(Index));
         }
 
+        /// <summary>
+        /// Displays deletion confirmation for a category owned by the current user.
+        /// </summary>
+        /// <param name="id">The category ID.</param>
+        /// <returns>
+        /// The confirmation view, a bad request for a non-positive ID, not found for a missing or foreign category,
+        /// or an authentication challenge if the user ID is unavailable.
+        /// </returns>
         [HttpGet]
         public async Task<IActionResult> Delete(int id)
         {
@@ -199,6 +251,14 @@ namespace MyBookmarks.Controllers
             return View(categoryDeleteViewModel);
         }
 
+        /// <summary>
+        /// Deletes the category after confirmation by its owner.
+        /// </summary>
+        /// <param name="model">The submitted deletion model containing the category ID.</param>
+        /// <returns>
+        /// A redirect to the category list on success, a bad request for invalid input,
+        /// not found for a missing or foreign category, or an authentication challenge if the user ID is unavailable.
+        /// </returns>
         [HttpPost]
         public async Task<IActionResult> Delete(CategoryDeleteViewModel model)
         {

@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore.Metadata.Internal;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using MyBookmarks.Common;
 using MyBookmarks.Data.Models;
 using MyBookmarks.Data.Repositories.Contracts;
@@ -9,15 +9,23 @@ using MyBookmarks.Services.Results;
 
 namespace MyBookmarks.Services
 {
+    /// <summary>
+    /// Implements category operations and ownership checks for the current user.
+    /// </summary>
     public class CategoryService : ICategoryService
     {
         private readonly ICategoryRepository categoryRepository;
 
+        /// <summary>
+        /// Initializes the instance with its required dependencies.
+        /// </summary>
+        /// <param name="categoryRepository">The repository used to read and persist categories.</param>
         public CategoryService(ICategoryRepository categoryRepository)
         {
             this.categoryRepository = categoryRepository;
         }
 
+        /// <inheritdoc />
         public async Task<PagedResultDto<CategoryListItemDto>> GetUserCategoriesAsync(string userId, int pageNumber)
         {
             if (pageNumber < 1)
@@ -56,6 +64,7 @@ namespace MyBookmarks.Services
             };
         }
 
+        /// <inheritdoc />
         public async Task<bool> TryCreateAsync(string userId, CategoryCreateDto dto)
         {
             string name = dto.Name.Trim();
@@ -76,6 +85,7 @@ namespace MyBookmarks.Services
             return true;
         }
 
+        /// <inheritdoc />
         public async Task<CategoryEditDto?> GetForEditAsync(string userId, int id)
         {
             Category? category = await categoryRepository.GetById(userId, id);
@@ -92,6 +102,7 @@ namespace MyBookmarks.Services
             };
         }
 
+        /// <inheritdoc />
         public async Task<CategoryEditResult> CategoryEditAsync(string userId, CategoryEditDto editDto)
         {
             Category? category = await categoryRepository.GetById(userId, editDto.Id);
@@ -117,6 +128,7 @@ namespace MyBookmarks.Services
             return CategoryEditResult.Success;
         }
 
+        /// <inheritdoc />
         public async Task<bool> TryDeleteAsync(string userId, int id)
         {
             Category? category = await categoryRepository.GetById(userId, id);
@@ -131,6 +143,7 @@ namespace MyBookmarks.Services
             return true;
         }
 
+        /// <inheritdoc />
         public async Task<CategoryDeleteDto?> GetForDeleteAsync(string userId, int id)
         {
             Category? category = await categoryRepository.GetById(userId, id);
@@ -147,6 +160,7 @@ namespace MyBookmarks.Services
             };
         }
 
+        /// <inheritdoc />
         public async Task<List<CategoryListItemDto>> GetOptionsAsync(string userId)
         {
             int count = await categoryRepository

@@ -1,4 +1,4 @@
-﻿using MyBookmarks.Common;
+using MyBookmarks.Common;
 using MyBookmarks.Data.Models;
 using MyBookmarks.Data.Repositories.Contracts;
 using MyBookmarks.Services.Contracts;
@@ -12,17 +12,26 @@ using System.Text;
 
 namespace MyBookmarks.Services
 {
+    /// <summary>
+    /// Implements collection operations and ownership checks for the current user.
+    /// </summary>
     public class CollectionService : ICollectionService
     {
         private readonly ICollectionRepository collectionRepository;
         private readonly IBookmarkRepository bookmarkRepository;
 
+        /// <summary>
+        /// Initializes the instance with its required dependencies.
+        /// </summary>
+        /// <param name="collectionRepository">The repository used to manage collections and bookmark links.</param>
+        /// <param name="bookmarkRepository">The repository used to retrieve bookmarks and check their ownership.</param>
         public CollectionService(ICollectionRepository collectionRepository, IBookmarkRepository bookmarkRepository)
         {
             this.collectionRepository = collectionRepository;
             this.bookmarkRepository = bookmarkRepository;
         }
 
+        /// <inheritdoc />
         public async Task<PagedResultDto<CollectionListItemDto>> 
             GetUserCollectionsAsync(string userId, int pageNumber)
         {
@@ -57,6 +66,7 @@ namespace MyBookmarks.Services
             };
         }
 
+        /// <inheritdoc />
         public async Task<bool> TryCreateAsync(string userId, CollectionCreateDto dto)
         {
             string name = dto.Name.Trim();
@@ -81,6 +91,7 @@ namespace MyBookmarks.Services
             return true;
         }
 
+        /// <inheritdoc />
         public async Task<CollectionEditDto?> GetForEditAsync(string userId, int id)
         {
             Collection? collection = await collectionRepository
@@ -99,6 +110,7 @@ namespace MyBookmarks.Services
             };
         }
 
+        /// <inheritdoc />
         public async Task<CollectionEditResult> EditAsync(string userId, CollectionEditDto dto)
         {
             Collection? collection = await this.collectionRepository
@@ -127,6 +139,7 @@ namespace MyBookmarks.Services
             return CollectionEditResult.Success;
         }
 
+        /// <inheritdoc />
         public async Task<CollectionDeleteDto?> GetForDeleteAsync(string userId, int id)
         {
             Collection? collection = await collectionRepository
@@ -144,6 +157,7 @@ namespace MyBookmarks.Services
             };
         }
 
+        /// <inheritdoc />
         public async Task<bool> TryDeleteAsync(string userId, int id)
         {
             Collection? collection = await collectionRepository
@@ -159,6 +173,7 @@ namespace MyBookmarks.Services
             return true;
         }
 
+        /// <inheritdoc />
         public async Task<CollectionDetailsDto?> GetDetailsAsync(string userId, int id, int pageNumber)
         {
             Collection? collection = await collectionRepository
@@ -210,6 +225,7 @@ namespace MyBookmarks.Services
             };
         }
 
+        /// <inheritdoc />
         public async Task<bool> TryAddBookmarkAsync(string userId, int collectionId, int bookmarkId)
         {
             Collection? collection = await collectionRepository
@@ -247,6 +263,7 @@ namespace MyBookmarks.Services
             return true;
         }
 
+        /// <inheritdoc />
         public async Task<CollectionListItemDto?> GetByIdAsync(string userId, int id)
         {
             Collection? collection = await this.collectionRepository
@@ -265,12 +282,14 @@ namespace MyBookmarks.Services
             };
         }
 
+        /// <inheritdoc />
         public async Task<List<int>> GetIncludedBookmarkIdsAsync(string userId, int collectionId, List<int> bookmarkIds)
         {
             return await collectionRepository.
                 GetIncludedBookmarkIdsAsync(userId, collectionId, bookmarkIds);
         }
 
+        /// <inheritdoc />
         public async Task<bool> TryRemoveBookmarkAsync(string userId, int collectionId, int bookmarkId)
         {
             Collection? collection = await collectionRepository

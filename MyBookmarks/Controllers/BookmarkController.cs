@@ -14,11 +14,19 @@ using System.Security.Claims;
 
 namespace MyBookmarks.Controllers
 {
+    /// <summary>
+    /// Handles bookmark pages, form submissions and favorite updates for the current user.
+    /// </summary>
     public class BookmarkController : Controller
     {
         private readonly IBookmarkService bookmarkService;
         private readonly ICategoryService categoryService;
 
+        /// <summary>
+        /// Initializes the instance with its required dependencies.
+        /// </summary>
+        /// <param name="bookmarkService">The service providing bookmark operations.</param>
+        /// <param name="categoryService">The service providing the user's category options.</param>
         public BookmarkController(IBookmarkService bookmarkService,
              ICategoryService categoryService)
         {
@@ -26,6 +34,18 @@ namespace MyBookmarks.Controllers
             this.categoryService = categoryService;
         }
 
+        /// <summary>
+        /// Displays a page of the current user's bookmarks with search, filters and sorting.
+        /// </summary>
+        /// <param name="pageNumber">The requested page number, starting at 1.</param>
+        /// <param name="searchTerm">Text to search for within bookmark titles.</param>
+        /// <param name="categoryId">The category ID to filter by, or null to include all categories.</param>
+        /// <param name="onlyFavorites">Whether to show only favorite bookmarks.</param>
+        /// <param name="sortOrder">The requested bookmark ordering.</param>
+        /// <returns>
+        /// The bookmark list; a bad request for an invalid page number, category ID or sort order;
+        /// not found for a missing or foreign category; or an authentication challenge if the user ID is unavailable.
+        /// </returns>
         [HttpGet]
         public async Task<IActionResult> Index(
             int pageNumber = 1, string? searchTerm = null, 
@@ -104,6 +124,12 @@ namespace MyBookmarks.Controllers
             return View(model);
         }
 
+        /// <summary>
+        /// Displays the bookmark creation form with the current user's category options.
+        /// </summary>
+        /// <returns>
+        /// The creation form, or an authentication challenge if the user ID is unavailable.
+        /// </returns>
         [HttpGet]
         public async Task<IActionResult> Create()
         {
@@ -132,6 +158,14 @@ namespace MyBookmarks.Controllers
         }
 
 
+        /// <summary>
+        /// Processes the bookmark creation form for the current user.
+        /// </summary>
+        /// <param name="bookCreateViewModel">The submitted bookmark data.</param>
+        /// <returns>
+        /// A redirect to the bookmark list on success; the form with errors for invalid input, duplicate title or URL,
+        /// or an invalid category; or an authentication challenge if the user ID is unavailable.
+        /// </returns>
         [HttpPost]
         public async Task<IActionResult> Create(BookmarkCreateViewModel bookCreateViewModel)
         {
@@ -202,6 +236,14 @@ namespace MyBookmarks.Controllers
             return View(bookCreateViewModel);
         }
 
+        /// <summary>
+        /// Displays the edit form for a bookmark owned by the current user.
+        /// </summary>
+        /// <param name="id">The bookmark ID.</param>
+        /// <returns>
+        /// The edit form with the user's category options, a bad request for a non-positive ID,
+        /// not found for a missing or foreign bookmark, or an authentication challenge if the user ID is unavailable.
+        /// </returns>
         [HttpGet]
         public async Task<IActionResult> Edit(int id)
         {
@@ -249,6 +291,14 @@ namespace MyBookmarks.Controllers
             return View(model);
         }
 
+        /// <summary>
+        /// Processes changes to a bookmark owned by the current user.
+        /// </summary>
+        /// <param name="bookmarkEditViewModel">The bookmark ID and submitted data.</param>
+        /// <returns>
+        /// A redirect to the bookmark list on success; the form with validation, duplicate or category errors;
+        /// not found for a missing or foreign bookmark; or an authentication challenge if the user ID is unavailable.
+        /// </returns>
         [HttpPost]
         public async Task<IActionResult> Edit(BookmarkEditViewModel bookmarkEditViewModel)
         {
@@ -320,6 +370,14 @@ namespace MyBookmarks.Controllers
             return View(bookmarkEditViewModel);
         }
 
+        /// <summary>
+        /// Displays deletion confirmation for a bookmark owned by the current user.
+        /// </summary>
+        /// <param name="id">The bookmark ID.</param>
+        /// <returns>
+        /// The confirmation view, a bad request for a zero ID, not found for a missing or foreign bookmark,
+        /// or an authentication challenge if the user ID is unavailable.
+        /// </returns>
         [HttpGet]
         public async Task<IActionResult> Delete(int id)
         {
@@ -352,6 +410,14 @@ namespace MyBookmarks.Controllers
             return View(model);
         }
 
+        /// <summary>
+        /// Deletes the bookmark after confirmation by its owner.
+        /// </summary>
+        /// <param name="model">The submitted deletion model containing the bookmark ID.</param>
+        /// <returns>
+        /// A redirect to the bookmark list on success, a bad request for invalid input,
+        /// not found for a missing or foreign bookmark, or an authentication challenge if the user ID is unavailable.
+        /// </returns>
         [HttpPost]
         public async Task<IActionResult> Delete(BookmarkDeleteViewModel model)
         {
@@ -378,6 +444,23 @@ namespace MyBookmarks.Controllers
             return RedirectToAction(nameof(Index));
         }
 
+        /// <summary>
+        /// Reverses a bookmark's favorite status and returns to the bookmark list.
+        /// </summary>
+        /// <param name="id">The bookmark ID.</param>
+        /// <param name="pageNumber">The page number to preserve when returning to the list.</param>
+        /// <param name="searchTerm">Text to search for within bookmark titles.</param>
+        /// <param name="categoryId">The category ID to filter by, or null to include all categories.</param>
+        /// <param name="onlyFavorites">Whether to show only favorite bookmarks.</param>
+        /// <param name="sortOrder">The requested bookmark ordering.</param>
+        /// <returns>
+        /// A redirect preserving the page, search, filters and sort order on success;
+        /// a bad request for a non-positive bookmark ID; not found for a missing or foreign bookmark;
+        /// or an authentication challenge if the user ID is unavailable.
+        /// </returns>
+        /// <remarks>
+        /// When the favorites filter is active, removing a bookmark from favorites also removes it from the displayed results.
+        /// </remarks>
         [HttpPost]
         public async Task<IActionResult> ToggleFavorite(
             int id, int pageNumber = 1, string? searchTerm = null, 
@@ -409,6 +492,11 @@ namespace MyBookmarks.Controllers
                     onlyFavorites, sortOrder });
         }
 
+        /// <summary>
+        /// Populates the creation form's category options, including when redisplaying invalid input.
+        /// </summary>
+        /// <param name="userId">The owner whose categories are available for selection.</param>
+        /// <param name="bookmarkCreateViewModel">The creation model to populate.</param>
         private async Task PopulateCategoriesAsync(string userId,
             BookmarkCreateViewModel bookmarkCreateViewModel)
         {
@@ -424,6 +512,11 @@ namespace MyBookmarks.Controllers
                 .ToList();
         }
 
+        /// <summary>
+        /// Populates the edit form's category options, including when redisplaying invalid input.
+        /// </summary>
+        /// <param name="userId">The owner whose categories are available for selection.</param>
+        /// <param name="model">The edit model to populate.</param>
         private async Task PopulateCategoriesAsync(string userId, BookmarkEditViewModel model)
         {
             List<CategoryListItemDto> categories = await categoryService

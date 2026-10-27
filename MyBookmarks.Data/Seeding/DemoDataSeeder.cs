@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using MyBookmarks.Data.Models;
 using System;
@@ -7,12 +7,32 @@ using System.Text;
 
 namespace MyBookmarks.Data.Seeding
 {
+    /// <summary>
+    /// Creates a demo account and sample data for local testing.
+    /// </summary>
+    /// <remarks>
+    /// The caller is responsible for restricting execution to the Development environment.
+    /// </remarks>
     public static class DemoDataSeeder
     {
         private const string DemoEmail = "demo@mybookmarks.test";
         private const string DemoPassword = "Demo123!";
         private const string SeedClaimType = "MyBookmarks.DemoDataSeeded";
 
+        /// <summary>
+        /// Ensures the demo account exists and loads its sample data once.
+        /// </summary>
+        /// <param name="dbContext">The database context used to save the sample data and completion marker.</param>
+        /// <param name="userManager">The Identity user manager used to find or create the demo account.</param>
+        /// <remarks>
+        /// Database migrations must already be applied.
+        /// A claim on the demo account records successful seeding.
+        /// When this marker exists, sample data is not recreated, preserving later edits and deletions.
+        /// The sample data and completion marker are saved together.
+        /// </remarks>
+        /// <exception cref="InvalidOperationException">
+        /// Identity cannot create the demo account.
+        /// </exception>
         public static async Task SeedAsync(MyBookmarksDbContext dbContext,
             UserManager<IdentityUser> userManager)
         {
@@ -47,6 +67,18 @@ namespace MyBookmarks.Data.Seeding
             await dbContext.SaveChangesAsync();
         }
 
+        /// <summary>
+        /// Retrieves the demo account by email, or creates it if it does not exist.
+        /// </summary>
+        /// <param name="userManager">The Identity user manager used to find or create the demo account.</param>
+        /// <returns>The existing or newly created demo account.</returns>
+        /// <remarks>
+        /// Existing account details and passwords are not changed.
+        /// New accounts are created with a confirmed email address and the predefined demo password.
+        /// </remarks>
+        /// <exception cref="InvalidOperationException">
+        /// Identity rejects creation of the demo account; the message contains the reported errors.
+        /// </exception>
         public static async Task<IdentityUser> EnsureDemoUserAsync(
             UserManager<IdentityUser> userManager)
         {
@@ -81,6 +113,13 @@ namespace MyBookmarks.Data.Seeding
             return user;
         }
 
+        /// <summary>
+        /// Builds the sample categories in memory without saving them.
+        /// </summary>
+        /// <param name="userId">The demo account's ID.</param>
+        /// <returns>
+        /// The category entities to include in the initial sample dataset.
+        /// </returns>
         private static List<Category> CreateDemoCategories(string userId)
         {
             return new List<Category>
@@ -103,6 +142,17 @@ namespace MyBookmarks.Data.Seeding
             };
         }
 
+        /// <summary>
+        /// Builds sample bookmarks with categories, favorites and distinct creation dates.
+        /// </summary>
+        /// <param name="userId">The demo account's ID.</param>
+        /// <param name="categories">The category entities created for the same sample dataset.</param>
+        /// <returns>
+        /// The bookmark entities, including uncategorized entries and an entry without a description.
+        /// </returns>
+        /// <remarks>
+        /// The objects are not saved by this method. Shared category references are used instead of preassigned database IDs.
+        /// </remarks>
         private static List<Bookmark> CreateDemoBookmarks(string userId, 
             List<Category> categories)
         {
@@ -232,6 +282,17 @@ namespace MyBookmarks.Data.Seeding
             return bookmarks;
         }
 
+        /// <summary>
+        /// Builds sample collections and their links to existing sample bookmark objects.
+        /// </summary>
+        /// <param name="userId">The demo account's ID.</param>
+        /// <param name="bookmarks">The bookmark entities created for the same sample dataset.</param>
+        /// <returns>
+        /// The collection entities with their bookmark links, without saving them.
+        /// </returns>
+        /// <remarks>
+        /// One bookmark belongs to both collections to demonstrate collection membership.
+        /// </remarks>
         private static List<Collection> CreateDemoCollections(
             string userId, List<Bookmark> bookmarks)
         {

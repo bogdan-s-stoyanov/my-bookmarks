@@ -22,6 +22,9 @@ using MyBookmarks.Common;
 
 namespace MyBookmarks.Areas.Identity.Pages.Account
 {
+    /// <summary>
+    /// Handles public account registration through ASP.NET Core Identity.
+    /// </summary>
     [AllowAnonymous]
     public class RegisterModel : PageModel
     {
@@ -32,6 +35,14 @@ namespace MyBookmarks.Areas.Identity.Pages.Account
         private readonly ILogger<RegisterModel> _logger;
         private readonly IEmailSender _emailSender;
 
+        /// <summary>
+        /// Initializes the page model with its Identity dependencies.
+        /// </summary>
+        /// <param name="userManager">The manager used to create Identity accounts.</param>
+        /// <param name="userStore">The store used to set account names and email addresses.</param>
+        /// <param name="signInManager">The manager used to sign in newly registered users.</param>
+        /// <param name="logger">The logger used for registration events.</param>
+        /// <param name="emailSender">The sender invoked with the account confirmation email.</param>
         public RegisterModel(
             UserManager<IdentityUser> userManager,
             IUserStore<IdentityUser> userStore,
@@ -48,33 +59,28 @@ namespace MyBookmarks.Areas.Identity.Pages.Account
         }
 
         /// <summary>
-        ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
-        ///     directly from your code. This API may change or be removed in future releases.
+        /// Gets or sets the submitted registration data.
         /// </summary>
         [BindProperty]
         public InputModel Input { get; set; }
 
         /// <summary>
-        ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
-        ///     directly from your code. This API may change or be removed in future releases.
+        /// Gets or sets the intended local destination after successful authentication.
         /// </summary>
         public string ReturnUrl { get; set; }
 
         /// <summary>
-        ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
-        ///     directly from your code. This API may change or be removed in future releases.
+        /// Gets or sets the external authentication schemes configured in Identity.
         /// </summary>
         public IList<AuthenticationScheme> ExternalLogins { get; set; }
 
         /// <summary>
-        ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
-        ///     directly from your code. This API may change or be removed in future releases.
+        /// Contains the account data and validation rules for registration.
         /// </summary>
         public class InputModel
         {
             /// <summary>
-            ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
-            ///     directly from your code. This API may change or be removed in future releases.
+            /// Gets or sets the email address used as the account's user name.
             /// </summary>
             [Required]
             [EmailAddress]
@@ -82,8 +88,7 @@ namespace MyBookmarks.Areas.Identity.Pages.Account
             public string Email { get; set; }
 
             /// <summary>
-            ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
-            ///     directly from your code. This API may change or be removed in future releases.
+            /// Gets or sets the password submitted for the new account.
             /// </summary>
             [Required]
             [StringLength(AccountValidationConstants.PasswordMaxLength, ErrorMessage = "The {0} must be at least {2} and at max {1} characters long.", MinimumLength = AccountValidationConstants.PasswordMinLength)]
@@ -92,8 +97,7 @@ namespace MyBookmarks.Areas.Identity.Pages.Account
             public string Password { get; set; }
 
             /// <summary>
-            ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
-            ///     directly from your code. This API may change or be removed in future releases.
+            /// Gets or sets the password confirmation, which must match the submitted password.
             /// </summary>
             [DataType(DataType.Password)]
             [Display(Name = "Confirm password")]
@@ -102,12 +106,27 @@ namespace MyBookmarks.Areas.Identity.Pages.Account
         }
 
 
+        /// <summary>
+        /// Prepares the registration page and its configured external authentication schemes.
+        /// </summary>
+        /// <param name="returnUrl">The intended local destination after registration.</param>
         public async Task OnGetAsync(string returnUrl = null)
         {
             ReturnUrl = returnUrl;
             ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
         }
 
+        /// <summary>
+        /// Creates an account from valid registration data and starts the configured confirmation or sign-in flow.
+        /// </summary>
+        /// <param name="returnUrl">The local destination after registration, or null to use the application root.</param>
+        /// <returns>
+        /// A confirmation page if confirmed accounts are required; otherwise, a local redirect after sign-in.
+        /// Invalid input or Identity errors redisplay the registration page.
+        /// </returns>
+        /// <remarks>
+        /// The handler invokes the configured email sender with a confirmation link; actual delivery depends on the sender configuration.
+        /// </remarks>
         public async Task<IActionResult> OnPostAsync(string returnUrl = null)
         {
             returnUrl ??= Url.Content("~/");
@@ -156,6 +175,13 @@ namespace MyBookmarks.Areas.Identity.Pages.Account
             return Page();
         }
 
+        /// <summary>
+        /// Creates an Identity user instance for registration.
+        /// </summary>
+        /// <returns>
+        /// A new Identity user.
+        /// </returns>
+        /// <exception cref="InvalidOperationException">The configured Identity user type cannot be instantiated.</exception>
         private IdentityUser CreateUser()
         {
             try
@@ -170,6 +196,13 @@ namespace MyBookmarks.Areas.Identity.Pages.Account
             }
         }
 
+        /// <summary>
+        /// Gets the user store required to persist registration email addresses.
+        /// </summary>
+        /// <returns>
+        /// The user store with email support.
+        /// </returns>
+        /// <exception cref="NotSupportedException">The configured user manager does not support email storage.</exception>
         private IUserEmailStore<IdentityUser> GetEmailStore()
         {
             if (!_userManager.SupportsUserEmail)

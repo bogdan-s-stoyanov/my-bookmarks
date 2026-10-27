@@ -8,15 +8,23 @@ using System.Text;
 
 namespace MyBookmarks.Data.Repositories
 {
+    /// <summary>
+    /// Reads and persists bookmark data using Entity Framework Core.
+    /// </summary>
     public class BookmarkRepository : IBookmarkRepository
     {
         private MyBookmarksDbContext dbContext;
 
+        /// <summary>
+        /// Initializes the instance with its required dependencies.
+        /// </summary>
+        /// <param name="dbContext">The database context used for bookmark storage.</param>
         public BookmarkRepository(MyBookmarksDbContext dbContext)
         {
             this.dbContext = dbContext;
         }
 
+        /// <inheritdoc />
         public async Task<int> CountBookmarksForUserAsync(
             string userId, string? searchTerm = null, 
             int? categoryId = null, bool onlyFavorites = false)
@@ -42,6 +50,7 @@ namespace MyBookmarks.Data.Repositories
             return await query.CountAsync();
         }
 
+        /// <inheritdoc />
         public async Task<List<Bookmark>> GetBookmarksByUserIdAsync(
             string userId, int take, int skip,
             string? searchTerm = null, int? categoryId = null,
@@ -106,30 +115,35 @@ namespace MyBookmarks.Data.Repositories
                 .ToListAsync();
         }
 
+        /// <inheritdoc />
         public async Task AddAsync(Bookmark bookmark)
         {
             dbContext.Bookmarks.Add(bookmark);
             await dbContext.SaveChangesAsync();
         }
 
+        /// <inheritdoc />
         public async Task<bool> ExistsByIdAsync(string userId, int id)
         {
             return await dbContext.Bookmarks
                 .AnyAsync(b => b.UserId == userId && b.Id == id);
         }
 
+        /// <inheritdoc />
         public async Task<bool> ExistsByUrlAsync(string userId, string url)
         {
             return await dbContext.Bookmarks
                 .AnyAsync(b => b.UserId == userId && b.Url == url);
         }
 
+        /// <inheritdoc />
         public async Task<bool> ExistsByTitleAsync(string userId, string title)
         {
             return await dbContext.Bookmarks
                 .AnyAsync(b => b.UserId == userId && b.Title == title );
         }
 
+        /// <inheritdoc />
         public async Task<Bookmark?> GetByIdAsync(string userId, int id)
         {
             return await dbContext.Bookmarks
@@ -137,30 +151,35 @@ namespace MyBookmarks.Data.Repositories
                     b.UserId == userId && b.Id == id);
         }
 
+        /// <inheritdoc />
         public async Task UpdateAsync(Bookmark bookmark)
         {
             dbContext.Bookmarks.Update(bookmark);
             await dbContext.SaveChangesAsync();
         }
 
+        /// <inheritdoc />
         public Task<bool> ExistsByTitleExceptIdAsync(string userId, string title, int excludedId)
         {
             return dbContext.Bookmarks
                 .AnyAsync(b => b.UserId == userId && b.Title == title && b.Id != excludedId);
         }
 
+        /// <inheritdoc />
         public Task<bool> ExistsByUrlExceptIdAsync(string userId, string url, int excludedId)
         {
             return dbContext.Bookmarks
                 .AnyAsync(b => b.UserId == userId && b.Url == url && b.Id != excludedId);
         }
 
+        /// <inheritdoc />
         public async Task DeleteAsync(Bookmark bookmark)
         {
             dbContext.Bookmarks.Remove(bookmark);
             await dbContext.SaveChangesAsync();
         }
 
+        /// <inheritdoc />
         public Task<List<Bookmark>> GetByCollectionAsync(string userId, int collectionId, int take, int skip)
         {
             return dbContext.Bookmarks
@@ -178,6 +197,7 @@ namespace MyBookmarks.Data.Repositories
                 .ToListAsync();
         }
 
+        /// <inheritdoc />
         public async Task<int> CountByCollectionAsync(string userId, int collectionId)
         {
             return await dbContext.Bookmarks

@@ -12,11 +12,19 @@ using MyBookmarks.Services.Results;
 
 namespace MyBookmarks.Services
 {
+    /// <summary>
+    /// Implements bookmark operations and ownership checks for the current user.
+    /// </summary>
     public class BookmarkService : IBookmarkService
     {
         private readonly IBookmarkRepository bookmarkRepository;
         private readonly ICategoryRepository categoryRepository;
 
+        /// <summary>
+        /// Initializes the instance with its required dependencies.
+        /// </summary>
+        /// <param name="bookmarkRepository">The repository used to read and persist bookmarks.</param>
+        /// <param name="categoryRepository">The repository used to check ownership of selected categories.</param>
         public BookmarkService(IBookmarkRepository bookmarkRepository,
             ICategoryRepository categoryRepository)
         {
@@ -24,6 +32,7 @@ namespace MyBookmarks.Services
             this.categoryRepository = categoryRepository;
         }
 
+        /// <inheritdoc />
         public async Task<PagedResultDto<BookmarkListItemDto>> GetUserBookmarksAsync(
              string userId, int pageNumber,
              string? searchTerm = null, int? categoryId = null,
@@ -67,6 +76,7 @@ namespace MyBookmarks.Services
             };
         }
 
+        /// <inheritdoc />
         public async Task<BookmarkCreateResult> CreateAsync(string userId, BookmarkCreateDto bookmarkDto)
         {
             if (!UrlHelper.TryNormalize(bookmarkDto.Url, out string normalizedUrl))
@@ -120,6 +130,7 @@ namespace MyBookmarks.Services
             return BookmarkCreateResult.Success;
         }
 
+        /// <inheritdoc />
         public async Task<BookmarkEditDto?> GetForEditAsync(string userId, int id)
         {
             Bookmark? bookmark = await bookmarkRepository
@@ -140,6 +151,7 @@ namespace MyBookmarks.Services
             };
         }
 
+        /// <inheritdoc />
         public async Task<BookmarkEditResult> EditAsync(string userId, BookmarkEditDto bookmarkEditDto)
         {
             Bookmark? bookmark = await bookmarkRepository
@@ -195,6 +207,7 @@ namespace MyBookmarks.Services
             return BookmarkEditResult.Success;
         }
 
+        /// <inheritdoc />
         public async Task<BookmarkDeleteDto?> GetForDeleteAsync(string userId, int id)
         {
             Bookmark? bookmark = await bookmarkRepository.GetByIdAsync(userId, id);
@@ -211,6 +224,7 @@ namespace MyBookmarks.Services
             };
         }
 
+        /// <inheritdoc />
         public async Task<bool> TryDeleteAsync(string userId, int id)
         {
             Bookmark? bookmark = await bookmarkRepository
@@ -226,6 +240,7 @@ namespace MyBookmarks.Services
             return true;
         }
 
+        /// <inheritdoc />
         public async Task<bool> ToggleFavoriteAsync(string userId, int id)
         {
             Bookmark? bookmark = await bookmarkRepository

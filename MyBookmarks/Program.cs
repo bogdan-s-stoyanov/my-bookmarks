@@ -14,8 +14,18 @@ using MyBookmarks.Services.Contracts;
 
 namespace MyBookmarks
 {
+    /// <summary>
+    /// Configures and starts the MVC application, Identity, data access and development demo seeding.
+    /// </summary>
     public class Program
     {
+        /// <summary>
+        /// Builds the application, seeds demo data in Development and starts the web host.
+        /// </summary>
+        /// <param name="args">Command-line arguments used to configure the application.</param>
+        /// <remarks>
+        /// Database migrations must be applied before startup when development seeding is enabled.
+        /// </remarks>
         public static async Task Main(string[] args)
         {
             WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
