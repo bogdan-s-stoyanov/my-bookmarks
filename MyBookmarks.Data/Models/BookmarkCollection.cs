@@ -10,25 +10,13 @@ namespace MyBookmarks.Data.Models
     /// </remarks>
     public class BookmarkCollection
     {
-        /// <summary>
-        /// Gets or sets the identifier of the linked bookmark.
-        /// </summary>
         public int BookmarkId { get; set; }
 
-        /// <summary>
-        /// Gets or sets the linked bookmark navigation.
-        /// </summary>
         [ForeignKey(nameof(BookmarkId))]
         public Bookmark Bookmark { get; set; } = null!;
 
-        /// <summary>
-        /// Gets or sets the identifier of the linked collection.
-        /// </summary>
         public int CollectionId { get; set; }
 
-        /// <summary>
-        /// Gets or sets the linked collection navigation.
-        /// </summary>
         [ForeignKey(nameof(CollectionId))]
         public Collection Collection { get; set; } = null!;
     }

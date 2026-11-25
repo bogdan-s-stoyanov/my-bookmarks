@@ -9,9 +9,6 @@ namespace MyBookmarks.Services.Results
     /// </summary>
     public enum CategoryEditResult
     {
-        /// <summary>
-        /// The category was successfully updated.
-        /// </summary>
         Success,
         /// <summary>
         /// The category is missing or belongs to another user.

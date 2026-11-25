@@ -7,15 +7,8 @@ using System.Text;
 
 namespace MyBookmarks.Data.Configurations
 {
-    /// <summary>
-    /// Configures category ownership, unique names per owner and uncategorizing bookmarks on category deletion.
-    /// </summary>
     internal class CategoryConfiguration : IEntityTypeConfiguration<Category>
     {
-        /// <summary>
-        /// Configures category ownership, unique names per owner and uncategorizing bookmarks on category deletion.
-        /// </summary>
-        /// <param name="builder">The entity builder for category entities.</param>
         public void Configure(EntityTypeBuilder<Category> builder)
         {
             builder.HasMany(c => c.Bookmarks)

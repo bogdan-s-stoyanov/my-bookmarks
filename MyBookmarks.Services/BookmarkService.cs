@@ -13,18 +13,14 @@ using MyBookmarks.Services.Results;
 namespace MyBookmarks.Services
 {
     /// <summary>
-    /// Implements bookmark operations and ownership checks for the current user.
+    /// Manages user-owned bookmarks, validates URLs and prevents duplicate titles and URLs per user.
     /// </summary>
     public class BookmarkService : IBookmarkService
     {
         private readonly IBookmarkRepository bookmarkRepository;
         private readonly ICategoryRepository categoryRepository;
 
-        /// <summary>
-        /// Initializes the instance with its required dependencies.
-        /// </summary>
-        /// <param name="bookmarkRepository">The repository used to read and persist bookmarks.</param>
-        /// <param name="categoryRepository">The repository used to check ownership of selected categories.</param>
+
         public BookmarkService(IBookmarkRepository bookmarkRepository,
             ICategoryRepository categoryRepository)
         {

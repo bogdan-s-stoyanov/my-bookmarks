@@ -9,9 +9,6 @@ namespace MyBookmarks.Services.Results
     /// </summary>
     public enum BookmarkCreateResult
     {
-        /// <summary>
-        /// The bookmark was successfully created.
-        /// </summary>
         Success,
         /// <summary>
         /// The URL is not an absolute HTTP or HTTPS URL, or exceeds the allowed length after normalization.

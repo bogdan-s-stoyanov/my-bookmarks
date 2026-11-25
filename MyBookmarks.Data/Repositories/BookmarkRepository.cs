@@ -15,10 +15,6 @@ namespace MyBookmarks.Data.Repositories
     {
         private MyBookmarksDbContext dbContext;
 
-        /// <summary>
-        /// Initializes the instance with its required dependencies.
-        /// </summary>
-        /// <param name="dbContext">The database context used for bookmark storage.</param>
         public BookmarkRepository(MyBookmarksDbContext dbContext)
         {
             this.dbContext = dbContext;

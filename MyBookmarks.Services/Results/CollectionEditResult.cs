@@ -9,9 +9,6 @@ namespace MyBookmarks.Services.Results
     /// </summary>
     public enum CollectionEditResult
     {
-        /// <summary>
-        /// The collection was successfully updated.
-        /// </summary>
         Success,
         /// <summary>
         /// The collection is missing or belongs to another user.

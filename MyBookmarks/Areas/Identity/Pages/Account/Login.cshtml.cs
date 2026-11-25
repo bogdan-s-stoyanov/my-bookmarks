@@ -26,54 +26,28 @@ namespace MyBookmarks.Areas.Identity.Pages.Account
         private readonly SignInManager<IdentityUser> _signInManager;
         private readonly ILogger<LoginModel> _logger;
 
-        /// <summary>
-        /// Initializes the page model with its Identity dependencies.
-        /// </summary>
-        /// <param name="signInManager">The manager used for password sign-in and external sign-in state.</param>
-        /// <param name="logger">The logger used for sign-in events.</param>
         public LoginModel(SignInManager<IdentityUser> signInManager, ILogger<LoginModel> logger)
         {
             _signInManager = signInManager;
             _logger = logger;
         }
 
-        /// <summary>
-        /// Gets or sets the submitted login credentials.
-        /// </summary>
         [BindProperty]
         public InputModel Input { get; set; }
 
-        /// <summary>
-        /// Gets or sets the external authentication schemes configured in Identity.
-        /// </summary>
         public IList<AuthenticationScheme> ExternalLogins { get; set; }
 
-        /// <summary>
-        /// Gets or sets the intended local destination after successful authentication.
-        /// </summary>
         public string ReturnUrl { get; set; }
 
-        /// <summary>
-        /// Gets or sets a temporary error message to display on the login page.
-        /// </summary>
         [TempData]
         public string ErrorMessage { get; set; }
 
-        /// <summary>
-        /// Contains the credentials and persistence option submitted by the login form.
-        /// </summary>
         public class InputModel
         {
-            /// <summary>
-            /// Gets or sets the email address used as the account's user name.
-            /// </summary>
             [Required]
             [EmailAddress]
             public string Email { get; set; }
 
-            /// <summary>
-            /// Gets or sets the password submitted for authentication.
-            /// </summary>
             [Required]
             [DataType(DataType.Password)]
             public string Password { get; set; }
@@ -98,7 +72,6 @@ namespace MyBookmarks.Areas.Identity.Pages.Account
 
             returnUrl ??= Url.Content("~/");
 
-            // Clear the existing external cookie to ensure a clean login process
             await HttpContext.SignOutAsync(IdentityConstants.ExternalScheme);
 
             ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
@@ -125,8 +98,6 @@ namespace MyBookmarks.Areas.Identity.Pages.Account
 
             if (ModelState.IsValid)
             {
-                // This doesn't count login failures towards account lockout
-                // To enable password failures to trigger account lockout, set lockoutOnFailure: true
                 var result = await _signInManager.PasswordSignInAsync(Input.Email, Input.Password, Input.RememberMe, lockoutOnFailure: false);
                 if (result.Succeeded)
                 {
@@ -149,7 +120,6 @@ namespace MyBookmarks.Areas.Identity.Pages.Account
                 }
             }
 
-            // If we got this far, something failed, redisplay form
             return Page();
         }
     }

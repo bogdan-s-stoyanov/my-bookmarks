@@ -20,17 +20,15 @@ namespace MyBookmarks
     public class Program
     {
         /// <summary>
-        /// Builds the application, seeds demo data in Development and starts the web host.
+        /// Starts the application and seeds demo data in Development.
         /// </summary>
-        /// <param name="args">Command-line arguments used to configure the application.</param>
         /// <remarks>
-        /// Database migrations must be applied before startup when development seeding is enabled.
+        /// Apply database migrations before starting with demo seeding enabled.
         /// </remarks>
         public static async Task Main(string[] args)
         {
             WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
-            // Add services to the container.
             string connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
             builder.Services.AddDbContext<MyBookmarksDbContext>(options =>
                 options.UseSqlServer(connectionString));
@@ -82,7 +80,6 @@ namespace MyBookmarks
                 await DemoDataSeeder.SeedAsync(dbContext, userManager);
             }
 
-            // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())
             {
                 app.UseMigrationsEndPoint();

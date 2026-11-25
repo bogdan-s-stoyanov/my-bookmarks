@@ -13,18 +13,13 @@ using System.Text;
 namespace MyBookmarks.Services
 {
     /// <summary>
-    /// Implements collection operations and ownership checks for the current user.
+    /// Manages user-owned collections and their bookmark membership.
     /// </summary>
     public class CollectionService : ICollectionService
     {
         private readonly ICollectionRepository collectionRepository;
         private readonly IBookmarkRepository bookmarkRepository;
 
-        /// <summary>
-        /// Initializes the instance with its required dependencies.
-        /// </summary>
-        /// <param name="collectionRepository">The repository used to manage collections and bookmark links.</param>
-        /// <param name="bookmarkRepository">The repository used to retrieve bookmarks and check their ownership.</param>
         public CollectionService(ICollectionRepository collectionRepository, IBookmarkRepository bookmarkRepository)
         {
             this.collectionRepository = collectionRepository;
