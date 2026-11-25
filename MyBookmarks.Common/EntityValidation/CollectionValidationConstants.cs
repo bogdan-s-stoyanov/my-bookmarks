@@ -5,13 +5,7 @@ namespace MyBookmarks.Common.EntityValidation
     /// </summary>
     public static class CollectionValidationConstants
     {
-        /// <summary>
-        /// The maximum collection name length in characters.
-        /// </summary>
         public const int NameMaxLength = 100;
-        /// <summary>
-        /// The maximum collection description length in characters.
-        /// </summary>
         public const int DescriptionMaxLength = 500;
     }
 }

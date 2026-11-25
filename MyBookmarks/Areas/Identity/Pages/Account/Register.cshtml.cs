@@ -35,14 +35,6 @@ namespace MyBookmarks.Areas.Identity.Pages.Account
         private readonly ILogger<RegisterModel> _logger;
         private readonly IEmailSender _emailSender;
 
-        /// <summary>
-        /// Initializes the page model with its Identity dependencies.
-        /// </summary>
-        /// <param name="userManager">The manager used to create Identity accounts.</param>
-        /// <param name="userStore">The store used to set account names and email addresses.</param>
-        /// <param name="signInManager">The manager used to sign in newly registered users.</param>
-        /// <param name="logger">The logger used for registration events.</param>
-        /// <param name="emailSender">The sender invoked with the account confirmation email.</param>
         public RegisterModel(
             UserManager<IdentityUser> userManager,
             IUserStore<IdentityUser> userStore,
@@ -58,47 +50,26 @@ namespace MyBookmarks.Areas.Identity.Pages.Account
             _emailSender = emailSender;
         }
 
-        /// <summary>
-        /// Gets or sets the submitted registration data.
-        /// </summary>
         [BindProperty]
         public InputModel Input { get; set; }
 
-        /// <summary>
-        /// Gets or sets the intended local destination after successful authentication.
-        /// </summary>
         public string ReturnUrl { get; set; }
 
-        /// <summary>
-        /// Gets or sets the external authentication schemes configured in Identity.
-        /// </summary>
         public IList<AuthenticationScheme> ExternalLogins { get; set; }
 
-        /// <summary>
-        /// Contains the account data and validation rules for registration.
-        /// </summary>
         public class InputModel
         {
-            /// <summary>
-            /// Gets or sets the email address used as the account's user name.
-            /// </summary>
             [Required]
             [EmailAddress]
             [Display(Name = "Email")]
             public string Email { get; set; }
 
-            /// <summary>
-            /// Gets or sets the password submitted for the new account.
-            /// </summary>
             [Required]
             [StringLength(AccountValidationConstants.PasswordMaxLength, ErrorMessage = "The {0} must be at least {2} and at max {1} characters long.", MinimumLength = AccountValidationConstants.PasswordMinLength)]
             [DataType(DataType.Password)]
             [Display(Name = "Password")]
             public string Password { get; set; }
 
-            /// <summary>
-            /// Gets or sets the password confirmation, which must match the submitted password.
-            /// </summary>
             [DataType(DataType.Password)]
             [Display(Name = "Confirm password")]
             [Compare("Password", ErrorMessage = "The password and confirmation password do not match.")]
@@ -106,10 +77,6 @@ namespace MyBookmarks.Areas.Identity.Pages.Account
         }
 
 
-        /// <summary>
-        /// Prepares the registration page and its configured external authentication schemes.
-        /// </summary>
-        /// <param name="returnUrl">The intended local destination after registration.</param>
         public async Task OnGetAsync(string returnUrl = null)
         {
             ReturnUrl = returnUrl;
@@ -171,7 +138,6 @@ namespace MyBookmarks.Areas.Identity.Pages.Account
                 }
             }
 
-            // If we got this far, something failed, redisplay form
             return Page();
         }
 

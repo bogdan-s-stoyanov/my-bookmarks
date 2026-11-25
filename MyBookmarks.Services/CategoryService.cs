@@ -10,16 +10,12 @@ using MyBookmarks.Services.Results;
 namespace MyBookmarks.Services
 {
     /// <summary>
-    /// Implements category operations and ownership checks for the current user.
+    /// Manages user-owned categories and enforces unique category names per user.
     /// </summary>
     public class CategoryService : ICategoryService
     {
         private readonly ICategoryRepository categoryRepository;
 
-        /// <summary>
-        /// Initializes the instance with its required dependencies.
-        /// </summary>
-        /// <param name="categoryRepository">The repository used to read and persist categories.</param>
         public CategoryService(ICategoryRepository categoryRepository)
         {
             this.categoryRepository = categoryRepository;

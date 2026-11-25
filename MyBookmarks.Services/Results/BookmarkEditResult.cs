@@ -9,9 +9,6 @@ namespace MyBookmarks.Services.Results
     /// </summary>
     public enum BookmarkEditResult
     {
-        /// <summary>
-        /// The bookmark was successfully updated.
-        /// </summary>
         Success,
         /// <summary>
         /// The bookmark is missing or belongs to another user.

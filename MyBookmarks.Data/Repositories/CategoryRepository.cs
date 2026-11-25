@@ -14,10 +14,6 @@ namespace MyBookmarks.Data.Repositories
     {
         private readonly MyBookmarksDbContext dbContext;
 
-        /// <summary>
-        /// Initializes the instance with its required dependencies.
-        /// </summary>
-        /// <param name="dbContext">The database context used for category storage.</param>
         public CategoryRepository(MyBookmarksDbContext dbContext)
         {
             this.dbContext = dbContext;
